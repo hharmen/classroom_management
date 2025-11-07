@@ -1,14 +1,14 @@
 - name: Ensure apt cache is updated
   apt:
     update_cache: yes
-
+#git и libreoffice базовые программы для школ, по крайне мере у меня в школе были
 - name: Install Git and LibreOffice
   apt:
     name:
       - git
       - libreoffice
     state: present
-
+#через flatpak легче всего скачать pycharm и blender. Без них долго самому настраивать
 - name: Install Flatpak
   apt:
     name: flatpak
@@ -19,13 +19,13 @@
   args:
     creates: /var/lib/flatpak/repo/flathub.trustedkeys.gpg
 
-# PyCharm Community
+# ну куда же нам без pycharm 
 - name: Install PyCharm CE via Flatpak
   command: flatpak install -y flathub com.jetbrains.PyCharm-Community
   args:
     creates: /var/lib/flatpak/app/com.jetbrains.PyCharm-Community
 
-# Blender
+# для инженерных классов самое то
 - name: Install Blender via Flatpak
   command: flatpak install -y flathub org.blender.Blender
   args:
