@@ -1,0 +1,33 @@
+- name: Ensure apt cache is updated
+  apt:
+    update_cache: yes
+
+- name: Install Git and LibreOffice
+  apt:
+    name:
+      - git
+      - libreoffice
+    state: present
+
+- name: Install Flatpak
+  apt:
+    name: flatpak
+    state: present
+
+- name: Add Flathub remote
+  command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  args:
+    creates: /var/lib/flatpak/repo/flathub.trustedkeys.gpg
+
+# PyCharm Community
+- name: Install PyCharm CE via Flatpak
+  command: flatpak install -y flathub com.jetbrains.PyCharm-Community
+  args:
+    creates: /var/lib/flatpak/app/com.jetbrains.PyCharm-Community
+
+# Blender
+- name: Install Blender via Flatpak
+  command: flatpak install -y flathub org.blender.Blender
+  args:
+    creates: /var/lib/flatpak/app/org.blender.Blender
+
