@@ -1,0 +1,125 @@
+/* ------------------------------------------
+   ОБЩИЕ СТИЛИ
+------------------------------------------- */
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f1f1;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 350px;            /* фиксированная ширина */
+    margin: 60px auto;       /* центрирование по горизонтали */
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ------------------------------------------
+   СТИЛИ ДЛЯ СТРАНИЦЫ РЕГИСТРАЦИИ
+------------------------------------------- */
+.register-container {
+    text-align: center; /* центрируем все элементы внутри контейнера */
+}
+
+.register-container label {
+    display: block; /* каждая подпись на отдельной строке */
+    margin: 10px 0 6px 0;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.register-container input[type="text"],
+.register-container input[type="password"] {
+    width: 80%;                /* ширина поля меньше контейнера, красиво центрировано */
+    padding: 10px;
+    margin: 8px 0 20px;
+    border: 1px solid #888;    /* более тёмный цвет рамки */
+    border-radius: 12px;       /* сильно скруглённые края */
+    background-color: #f0f0f0; /* чуть тёмнее белого */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.2s;
+}
+
+.register-container input[type="text"]:focus,
+.register-container input[type="password"]:focus {
+    border-color: #5b8dfc;  /* при фокусе рамка подсвечивается */
+    background-color: #eaeaea; /* чуть светлее при фокусе */
+}
+
+/* ------------------------------------------
+   СТИЛИ ДЛЯ СПИСКОВ (index.html и files.html)
+------------------------------------------- */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.list label {
+    cursor: pointer;
+    text-align: left !important;
+    font-weight: 500;
+}
+
+.list input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* ------------------------------------------
+   СТИЛИ КНОПОК
+------------------------------------------- */
+button {
+    width: 100%;
+    padding: 10px;
+    background: #5b8dfc;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #3a6dec;
+}
+
+/* ------------------------------------------
+   КНОПКА ВОЗВРАТА
+------------------------------------------- */
+.back-btn {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 0;
+
+    background: #e6e6e6;
+    color: #333;
+
+    border-radius: 6px;
+    border: 1px solid #ccc;
+
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background: #d8d8d8;
+    color: #000;
+}
