@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор файлов</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Выбор файлов</h2>
+
+        <form action="index.html" method="get" id="filesForm">
+            <div class="list" id="filesList">
+                Загрузка файлов...
+            </div>
+
+            <button type="submit">Отправить файлы</button>
+        </form>
+
+        <button id="backToUsers" class="back-btn" type="button">⬅ Назад к пользователям</button>
+    </div>
+
+    <script>
+        // Загрузка списка файлов
+        fetch("files.json")
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById("filesList");
+                list.innerHTML = "";
+
+                data.files.forEach(file => {
+                    const label = document.createElement("label");
+                    label.innerHTML = `<input type="checkbox" name="file" value="${file}"> ${file}`;
+                    list.appendChild(label);
+                });
+            })
+            .catch(() => {
+                document.getElementById("filesList").innerHTML = "Ошибка загрузки списка файлов";
+            });
+
+        document.getElementById('backToUsers').onclick = () => {
+            window.location.href = "index.html";
+        };
+    </script>
+</body>
+</html>
