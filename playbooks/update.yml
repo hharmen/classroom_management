@@ -1,7 +1,0 @@
-- hosts: all_students
-  tasks:
-    - name: Update & upgrade
-      apt:
-        update_cache: yes
-        upgrade: yes
-
