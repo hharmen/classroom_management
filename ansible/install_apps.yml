@@ -1,0 +1,49 @@
+- name: Install selected programs on Ubuntu
+  hosts: all
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install LibreOffice
+      apt:
+        name: "libreoffice={{ install_programs.libreoffice }}"
+        state: present
+      when: install_programs.libreoffice is defined
+
+    - name: Install Git
+      apt:
+        name: "git={{ install_programs.git }}"
+        state: present
+      when: install_programs.git is defined
+
+    - name: Install VLC
+      apt:
+        name: "vlc={{ install_programs.vlc }}"
+        state: present
+      when: install_programs.vlc is defined
+
+    - name: Install PyCharm
+      snap:
+        name: "pycharm-professional"
+        classic: yes
+        state: present
+        channel: "{{ install_programs.pycharm }}"
+      when: install_programs.pycharm is defined
+
+    - name: Gather installed version and size
+      shell: |
+        dpkg-query -W -f='${Package} ${Version} ${Installed-Size}\n' {{ item }}
+      register: app_info
+      loop: "{{ install_programs.keys() | list }}"
+      ignore_errors: yes
+
+    - name: Show installed apps info
+      debug:
+        msg: "{{ item.stdout }}"
+      loop: "{{ app_info.results }}"
