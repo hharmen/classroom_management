@@ -1,5 +1,0 @@
-- hosts: all_students
-  become: yes
-  roles:
-    - software
-
