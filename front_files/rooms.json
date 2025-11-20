@@ -1,59 +1,52 @@
 [
   {
-    "id": 1,
-    "name": "Комната A",
     "code": "A123",
-    "expanded": false,
     "computers": [
       {
-        "id": 101,
-        "name": "PC-A1",
-        "ip": "192.168.0.101",
-        "status": "online",
         "expanded": false,
-        "lastActive": "2025-11-20 16:00",
         "files": [
           {
             "name": "Документ.pdf",
-            "type": "PDF документ",
             "size": "1.2MB",
-            "status": "uploaded"
+            "status": "uploaded",
+            "type": "PDF документ"
           }
-        ]
+        ],
+        "id": 101,
+        "ip": "192.168.0.101",
+        "lastActive": "2025-11-20 16:00",
+        "name": "PC-A1",
+        "status": "online"
       },
       {
-        "id": 102,
-        "name": "PC-A2",
-        "ip": "192.168.0.102",
-        "status": "offline",
         "expanded": false,
+        "files": [],
+        "id": 102,
+        "ip": "192.168.0.102",
         "lastActive": "2025-11-19 12:00",
-        "files": []
+        "name": "PC-A2",
+        "status": "offline"
       }
-    ]
+    ],
+    "expanded": false,
+    "id": 1,
+    "name": "Комната A"
   },
   {
-    "id": 2,
-    "name": "Комната B",
     "code": "B456",
-    "expanded": false,
     "computers": [
       {
-        "id": 201,
-        "name": "PC-B1",
-        "ip": "192.168.0.201",
-        "status": "online",
         "expanded": false,
+        "files": [],
+        "id": 201,
+        "ip": "192.168.0.201",
         "lastActive": "2025-11-20 15:45",
-        "files": [
-          {
-            "name": "Скрипт.py",
-            "type": "Python скрипт",
-            "size": "4KB",
-            "status": "pending"
-          }
-        ]
+        "name": "PC-B1",
+        "status": "online"
       }
-    ]
+    ],
+    "expanded": false,
+    "id": 2,
+    "name": "Комната B"
   }
 ]
