@@ -731,7 +731,6 @@
                         <div>
                           <div class="computer-name">${computer.name}</div>
                           <div class="computer-ip">${computer.ip}</div>
-                          <div class="computer-specs">${computer.specs}</div>
                         </div>
                       </div>
                       <div class="computer-stats">
@@ -739,6 +738,7 @@
                         <span><i class="fas fa-file"></i> ${computer.files.length} файлов</span>
                       </div>
                     </div>
+
                   </div>
                   ${computer.expanded ? `
                     <div class="files-history">
@@ -750,8 +750,6 @@
                               <th>Размер</th>
                               <th>Тип</th>
                               <th>Статус</th>
-                              <th>Дата загрузки</th>
-                              <th>Загрузил</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -762,7 +760,6 @@
                                     <i class="fas fa-file${getFileIcon(file.type)} file-icon"></i>
                                     <div class="file-details">
                                       <div class="file-name">${file.name}</div>
-                                      <div class="file-meta">ID: ${file.id}</div>
                                     </div>
                                   </div>
                                 </td>
@@ -773,8 +770,6 @@
                                     ${getStatusText(file.status)}
                                   </span>
                                 </td>
-                                <td>${file.date}</td>
-                                <td>${file.uploadedBy}</td>
                               </tr>
                             `).join('')}
                           </tbody>

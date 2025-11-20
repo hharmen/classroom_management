@@ -12,16 +12,12 @@
         "status": "online",
         "expanded": false,
         "lastActive": "2025-11-20 16:00",
-        "specs": "i7-9700, 16GB RAM",
         "files": [
           {
-            "id": "F101",
             "name": "Документ.pdf",
             "type": "PDF документ",
             "size": "1.2MB",
-            "status": "uploaded",
-            "date": "2025-11-20",
-            "uploadedBy": "Admin"
+            "status": "uploaded"
           }
         ]
       },
@@ -32,7 +28,6 @@
         "status": "offline",
         "expanded": false,
         "lastActive": "2025-11-19 12:00",
-        "specs": "i5-9400, 8GB RAM",
         "files": []
       }
     ]
@@ -50,16 +45,12 @@
         "status": "online",
         "expanded": false,
         "lastActive": "2025-11-20 15:45",
-        "specs": "Ryzen 5 3600, 16GB RAM",
         "files": [
           {
-            "id": "F201",
             "name": "Скрипт.py",
             "type": "Python скрипт",
             "size": "4KB",
-            "status": "pending",
-            "date": "2025-11-19",
-            "uploadedBy": "User1"
+            "status": "pending"
           }
         ]
       }
