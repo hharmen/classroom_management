@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Notepad++",
+    "version": "8.5",
+    "description": "Текстовый редактор для программистов",
+    "size": "5 MB",
+    "icon": "fas fa-file-alt",
+    "selected": false
+  },
+  {
+    "id": 2,
+    "name": "VLC Media Player",
+    "version": "3.0.18",
+    "description": "Медиа-плеер с поддержкой всех форматов",
+    "size": "40 MB",
+    "icon": "fas fa-play-circle",
+    "selected": false
+  },
+  {
+    "id": 3,
+    "name": "Google Chrome",
+    "version": "118.0",
+    "description": "Браузер от Google",
+    "size": "120 MB",
+    "icon": "fab fa-chrome",
+    "selected": false
+  }
+]

@@ -1,37 +1,43 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import json
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.')
 
-# Разрешаем отдавать файлы напрямую из папки проекта
 @app.route('/')
 def index():
-    return app.send_static_file("register.html")
+    return send_from_directory('.', 'Art.html')
 
+@app.route('/art2')
+def art2():
+    return send_from_directory('.', 'Art2.html')
 
-# Сохранение выбранных пользователей
-@app.route("/save-users", methods=["POST"])
-def save_users():
-    data = request.json
-    with open("selected_users.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    return jsonify({"status": "ok"})
+@app.route('/rooms.json')
+def rooms():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rooms.json')
+    return send_from_directory(os.path.dirname(path), 'rooms.json')
 
+@app.route('/apps.json')
+def apps():
+    return send_from_directory('.', 'apps.json')
 
-# Сохранение выбранных файлов
-@app.route("/save-files", methods=["POST"])
-def save_files():
-    data = request.json
-    with open("selected_files.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    return jsonify({"status": "ok"})
+@app.route('/save_selected', methods=['POST'])
+def save_selected():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Нет данных для сохранения"}), 400
+    
+    with open('selected.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    return jsonify({"message": "Выбор сохранён в selected.json"}), 200
 
+@app.route('/selected.json')
+def get_selected():
+    if os.path.exists('selected.json'):
+        return send_from_directory('.', 'selected.json')
+    else:
+        return jsonify({"message": "Файл selected.json ещё не создан"}), 404
 
-# Сервер отдаёт файлы из текущей директории
-@app.route('/<path:path>')
-def static_files(path):
-    return app.send_static_file(path)
-
-
-if __name__ == "__main__":
-    app.run(port=8000, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
