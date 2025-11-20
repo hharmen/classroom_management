@@ -2,14 +2,18 @@
   "computers": [
     {
       "id": 101,
-      "name": "PC-A1",
-      "ip": "192.168.0.101"
+      "name": "PC-A1"
     },
     {
       "id": 201,
-      "name": "PC-B1",
-      "ip": "192.168.0.201"
+      "name": "PC-B1"
     }
   ],
-  "apps": []
+  "apps": [
+    {
+      "id": 2,
+      "name": "VLC Media Player",
+      "version": "3.0.18"
+    }
+  ]
 }

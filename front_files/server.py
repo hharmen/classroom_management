@@ -70,14 +70,46 @@ def save_selected():
     if not data:
         return jsonify({"error": "Нет данных"}), 400
 
+    # Сохраняем локально
     with open(SELECTED_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    return jsonify({"message": "selected.json сохранён"}), 200
+    # 🔥 ОТПРАВЛЯЕМ ДАННЫЕ НА УДАЛЕННЫЙ СЕРВЕР
+    try:
+        print("📤 Отправка данных на удаленный сервер...")
+        response = requests.post(
+            f'{REMOTE_SERVER_URL}/receive_selected', 
+            json=data,
+            timeout=10
+        )
+        response.raise_for_status()
+        
+        remote_result = response.json()
+        print(f"✅ Данные успешно отправлены на удаленный сервер: {remote_result.get('message', '')}")
+        
+        return jsonify({
+            "message": "selected.json сохранён и отправлен на удаленный сервер",
+            "remote_response": remote_result
+        }), 200
+        
+    except requests.exceptions.ConnectionError:
+        error_msg = "Не удалось подключиться к удаленному серверу"
+        print(f"❌ {error_msg}")
+        return jsonify({
+            "message": "selected.json сохранён локально, но не отправлен на удаленный сервер",
+            "error": error_msg
+        }), 200
+    except Exception as e:
+        error_msg = f"Ошибка отправки на удаленный сервер: {str(e)}"
+        print(f"❌ {error_msg}")
+        return jsonify({
+            "message": "selected.json сохранён локально, но ошибка отправки на удаленный сервер",
+            "error": str(e)
+        }), 200
 
 
 # --------------------------
-#  🔥 НОВЫЙ МАРШРУТ: Синхронизация через proxy
+#  🔥 МАРШРУТ: Синхронизация через proxy
 # --------------------------
 
 @app.route('/sync_rooms', methods=['GET', 'POST'])
@@ -119,7 +151,7 @@ def sync_rooms():
 
 
 # --------------------------
-#  🔥 НОВЫЙ МАРШРУТ: Отправка selected.json через proxy
+#  🔥 МАРШРУТ: Отправка selected.json через proxy
 # --------------------------
 
 @app.route('/sync_selected', methods=['POST'])
@@ -143,10 +175,12 @@ def sync_selected():
         )
         response.raise_for_status()
         
+        remote_result = response.json()
         print("✅ selected.json успешно отправлен на удаленный сервер")
         
         return jsonify({
-            "message": "selected.json успешно отправлен на удаленный сервер"
+            "message": "selected.json успешно отправлен на удаленный сервер",
+            "remote_response": remote_result
         }), 200
         
     except Exception as e:
@@ -164,4 +198,5 @@ if __name__ == '__main__':
     print("📡 Прокси-маршруты доступны:")
     print("   GET/POST /sync_rooms - синхронизация комнат")
     print("   POST /sync_selected - отправка selected.json")
+    print("   POST /save_selected - сохраняет локально И отправляет на удаленный сервер")
     app.run(port=5000, debug=True)
