@@ -40,11 +40,11 @@ async function syncRooms() {
             statusElement.className = 'connection-status connected';
         }
         
-        // Показываем уведомление об успехе
-        showNotification(result.message, 'success');
+        // Показываем уведомление об успехе с информацией о сервере
+        const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
+        showNotification(result.message + serverInfo, 'success');
         
-        // 🔥 УБРАНА АВТОМАТИЧЕСКАЯ ПЕРЕЗАГРУЗКА СТРАНИЦЫ
-        // Вместо этого обновляем данные на странице без перезагрузки
+        // Обновляем данные на странице без перезагрузки
         updatePageData();
         
     } catch (err) {
@@ -105,49 +105,13 @@ async function updatePageData() {
 }
 
 // --------------------------------------------
-// 3) Сохранение и восстановление состояния развертывания
-// --------------------------------------------
-function saveExpandedState() {
-    if (!window.roomsData) return null;
-    
-    const state = {
-        rooms: {},
-        computers: {}
-    };
-    
-    window.roomsData.forEach(room => {
-        state.rooms[room.id] = room.expanded;
-        room.computers.forEach(computer => {
-            state.computers[computer.id] = computer.expanded;
-        });
-    });
-    
-    return state;
-}
-
-function restoreExpandedState(state) {
-    if (!state || !window.roomsData) return;
-    
-    window.roomsData.forEach(room => {
-        if (state.rooms.hasOwnProperty(room.id)) {
-            room.expanded = state.rooms[room.id];
-        }
-        room.computers.forEach(computer => {
-            if (state.computers.hasOwnProperty(computer.id)) {
-                computer.expanded = state.computers[computer.id];
-            }
-        });
-    });
-}
-
-// --------------------------------------------
-// 4) Отправка selected.json через proxy
+// 3) Отправка selected.json через proxy
 // --------------------------------------------
 async function sendSelectedToServer() {
     console.log("📤 Отправляем selected.json на удалённый сервер...");
 
     try {
-        const response = await fetch('/sync_selected', {
+        const response = await fetch('/save_selected', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -161,12 +125,36 @@ async function sendSelectedToServer() {
 
         const result = await response.json();
         console.log("✅ " + result.message);
-        showNotification(result.message, 'success');
+        
+        // 🔥 ВЫВОДИМ ИНФОРМАЦИЮ О СЕРВЕРЕ
+        const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
+        if (result.remote_response && result.remote_response.saved_to_file) {
+            showNotification(`${result.message} - сохранено в ${result.remote_response.saved_to_file}${serverInfo}`, 'success');
+        } else {
+            showNotification(result.message + serverInfo, 'success');
+        }
         
     } catch (err) {
         console.error("❌ Ошибка отправки selected.json:", err);
         showNotification(`Ошибка отправки selected.json: ${err.message}`, 'error');
     }
+}
+
+// --------------------------------------------
+// 4) Получение информации о сервере
+// --------------------------------------------
+async function getServerInfo() {
+    try {
+        const response = await fetch('/server_info');
+        if (response.ok) {
+            const info = await response.json();
+            console.log("📡 Информация о сервере:", info);
+            return info;
+        }
+    } catch (err) {
+        console.log("⚠ Не удалось получить информацию о сервере");
+    }
+    return null;
 }
 
 // --------------------------------------------
@@ -230,7 +218,43 @@ style.textContent = `
 document.head.appendChild(style);
 
 // --------------------------------------------
-// 6) Добавление кнопки синхронизации в интерфейс
+// 6) Сохранение и восстановление состояния развертывания
+// --------------------------------------------
+function saveExpandedState() {
+    if (!window.roomsData) return null;
+    
+    const state = {
+        rooms: {},
+        computers: {}
+    };
+    
+    window.roomsData.forEach(room => {
+        state.rooms[room.id] = room.expanded;
+        room.computers.forEach(computer => {
+            state.computers[computer.id] = computer.expanded;
+        });
+    });
+    
+    return state;
+}
+
+function restoreExpandedState(state) {
+    if (!state || !window.roomsData) return;
+    
+    window.roomsData.forEach(room => {
+        if (state.rooms.hasOwnProperty(room.id)) {
+            room.expanded = state.rooms[room.id];
+        }
+        room.computers.forEach(computer => {
+            if (state.computers.hasOwnProperty(computer.id)) {
+                computer.expanded = state.computers[computer.id];
+            }
+        });
+    });
+}
+
+// --------------------------------------------
+// 7) Добавление кнопки синхронизации в интерфейс
 // --------------------------------------------
 function addSyncButton() {
     // Проверяем, есть ли уже кнопка
@@ -265,7 +289,7 @@ function addSyncButton() {
 }
 
 // --------------------------------------------
-// 7) Автоматическая синхронизация при загрузке (ТОЛЬКО ДЛЯ Art.html)
+// 8) Автоматическая синхронизация при загрузке (ТОЛЬКО ДЛЯ Art.html)
 // --------------------------------------------
 function shouldAutoSync() {
     // Автосинхронизация только для главной страницы Art.html
@@ -289,10 +313,17 @@ function shouldAutoSync() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 sync.js загружен");
     
+    // Получаем информацию о сервере
+    getServerInfo().then(info => {
+        if (info) {
+            console.log(`📡 Настроен удаленный сервер: ${info.remote_server}`);
+        }
+    });
+    
     // Добавляем кнопки синхронизации
     addSyncButton();
     
-    // 🔥 ИСПРАВЛЕНО: Автоматическая синхронизация только при необходимости
+    // Автоматическая синхронизация только при необходимости
     if (shouldAutoSync()) {
         console.log("🔧 Запуск автоматической синхронизации...");
         setTimeout(syncRooms, 1000);
@@ -312,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // --------------------------------------------
-// 8) Глобальные функции для вызова из других скриптов
+// 9) Глобальные функции для вызова из других скриптов
 // --------------------------------------------
 window.syncRooms = syncRooms;
 window.sendSelectedToServer = sendSelectedToServer;

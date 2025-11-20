@@ -11,9 +11,19 @@
   ],
   "apps": [
     {
+      "id": 1,
+      "name": "Notepad++",
+      "version": "8.5"
+    },
+    {
       "id": 2,
       "name": "VLC Media Player",
       "version": "3.0.18"
+    },
+    {
+      "id": 3,
+      "name": "Google Chrome",
+      "version": "118.0"
     }
   ]
 }
