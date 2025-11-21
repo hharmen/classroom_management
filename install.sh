@@ -15,7 +15,7 @@ if [ ! -f ./computer-agent.go ]; then
     exit 1
 fi
 
-go build ./computer-agent.go
+go build -o computer-agent
 
 sudo mkdir -p /etc/computer-agent
 sudo mkdir -p /var/log/computer-agent
