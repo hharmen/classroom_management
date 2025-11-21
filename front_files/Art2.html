@@ -549,26 +549,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Элементы DOM
-      const roomsGrid = document.getElementById('roomsGrid');
-      const appsGrid = document.getElementById('appsGrid');
-      const selectAllBtn = document.getElementById('selectAllBtn');
-      const selectAllAppsBtn = document.getElementById('selectAllAppsBtn');
       const backBtn = document.getElementById('backBtn');
-      const refreshRoomsBtn = document.getElementById('refreshRooms');
-      const selectedCount = document.getElementById('selectedCount');
-      const downloadAllBtn = document.getElementById('downloadAllBtn');
-      const selectedFilesCount = document.getElementById('selectedFilesCount');
-      const selectedComputersCount = document.getElementById('selectedComputersCount');
       
       // Обработчик кнопки Назад
       backBtn.addEventListener('click', function() {
-        // Возврат на страницу мониторинга
         window.location.href = './';
       });
-      
-      // Данные приложения
-      let roomsData = [];
-      let readyApps = [];
 
       // Загружаем комнаты
       fetch('rooms.json')
@@ -577,10 +563,11 @@
           return response.json();
         })
         .then(data => {
-          roomsData = data; // теперь data — это массив комнат напрямую
-          renderRooms();
-          updateSelectedCount();
-          updateDownloadAllButton();
+          window.roomsData = data;
+          // Используем функции из sync.js
+          if (window.renderRoomsArt2) window.renderRoomsArt2();
+          if (window.updateSelectedCountArt2) window.updateSelectedCountArt2();
+          if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
         })
         .catch(err => {
           console.error('Ошибка загрузки rooms.json:', err);
@@ -594,300 +581,15 @@
           return response.json();
         })
         .then(data => {
-          readyApps = data; // теперь data — это массив приложений напрямую
-          renderApps();
-          updateDownloadAllButton();
+          window.readyApps = data;
+          // Используем функции из sync.js
+          if (window.renderAppsArt2) window.renderAppsArt2();
+          if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
         })
         .catch(err => {
           console.error('Ошибка загрузки apps.json:', err);
           alert('Не удалось загрузить данные приложений');
         });
-
-      
-      // Инициализация приложения
-      function initApp() {
-        renderRooms();
-        renderApps();
-        updateSelectedCount();
-        updateDownloadAllButton();
-        
-        // Обработчик выбора всех компьютеров
-        selectAllBtn.addEventListener('click', function() {
-          const allOnlineComputers = getAllOnlineComputers();
-          const currentlySelected = getSelectedComputers().length;
-          const allSelected = currentlySelected === allOnlineComputers.length;
-          
-          roomsData.forEach(room => {
-            room.computers.forEach(computer => {
-              if (computer.online) {
-                computer.selected = !allSelected;
-              }
-            });
-          });
-          
-          renderRooms();
-          updateSelectedCount();
-          updateDownloadAllButton();
-        });
-
-        
-        // Обработчик выбора всех приложений
-        selectAllAppsBtn.addEventListener('click', function() {
-          const currentlySelected = getSelectedApps().length;
-          const allSelected = currentlySelected === readyApps.length;
-          
-          readyApps.forEach(app => {
-            app.selected = !allSelected;
-          });
-          
-          renderApps();
-          updateDownloadAllButton();
-        });
-
-        
-        // Обработчик обновления комнат
-        refreshRoomsBtn.addEventListener('click', function() {
-          // Имитируем обновление статусов компьютеров
-          roomsData.forEach(room => {
-            room.computers.forEach(computer => {
-              if (Math.random() > 0.7) {
-                computer.online = !computer.online;
-                if (!computer.online) {
-                  computer.selected = false;
-                }
-              }
-            });
-          });
-          renderRooms();
-          updateSelectedCount();
-          updateDownloadAllButton();
-          alert('Статусы компьютеров обновлены!');
-        });
-
-        // Обработчик кнопки "Скачать файлы на выбранные компьютеры" с сохранением selected.json на сервер
-        downloadAllBtn.addEventListener('click', function() {
-          const selectedComputers = getSelectedComputers();
-          const selectedApps = getSelectedApps();
-
-          if (selectedComputers.length === 0) {
-            alert('Пожалуйста, выберите хотя бы один компьютер для загрузки.');
-            return;
-          }
-
-          if (selectedApps.length === 0) {
-            alert('Пожалуйста, выберите хотя бы одно приложение для скачивания.');
-            return;
-          }
-
-          const selectedData = {
-            computers: selectedComputers.map(c => ({ id: c.id, name: c.name, roomId: c.roomId })),
-            apps: selectedApps.map(a => ({ id: a.id, name: a.name, version: a.version }))
-          };
-
-          fetch('save_selected', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(selectedData)
-          })
-          .then(response => {
-            if (!response.ok) throw new Error('Ошибка при сохранении selected.json');
-            return response.json();
-          })
-          .then(data => {
-            alert(data.message || 'Выбор сохранён в selected.json');
-
-            // Сбрасываем выбор
-            roomsData.forEach(room => room.computers.forEach(c => c.selected = false));
-            readyApps.forEach(a => a.selected = false);
-
-            renderRooms();
-            renderApps();
-            updateSelectedCount();
-            updateDownloadAllButton();
-          })
-          .catch(err => {
-            console.error(err);
-            alert('Не удалось сохранить выбранные файлы.');
-          });
-        });
-
-
-      }
-      
-      // Функция отрисовки комнат
-      function renderRooms() {
-        if (roomsData.length === 0) {
-          roomsGrid.innerHTML = `
-            <div class="empty-message">
-              <i class="fas fa-door-closed fa-2x mb-3"></i><br>
-              У вас нет комнат
-            </div>
-          `;
-          return;
-        }
-
-        roomsGrid.innerHTML = roomsData.map(room => `
-          <div class="room-card">
-            <div class="room-header">
-              <h3 class="room-name">${room.name}</h3>
-              <div class="room-code">${room.code}</div>
-            </div>
-            <div class="computers-list">
-              ${room.computers.map(computer => {
-                const isOnline = computer.online ?? (computer.status === 'online'); // если online нет, проверяем status
-                const isSelected = computer.selected && isOnline;
-                return `
-                <div class="computer-item ${isSelected ? 'selected' : ''}" 
-                    data-computer-id="${computer.id}"
-                    data-room-id="${room.id}">
-                  <div class="computer-info">
-                    <div class="computer-checkbox ${isSelected ? 'checked' : ''} ${!isOnline ? 'disabled' : ''}">
-                    </div>
-                    <div class="computer-status ${isOnline ? 'status-online' : 'status-offline'}"></div>
-                    <span class="computer-name">${computer.name}</span>
-                  </div>
-                </div>
-                `;
-              }).join('')}
-
-            </div>
-          </div>
-        `).join('');
-
-        // Добавляем обработчики кликов для всей области компьютера
-        roomsGrid.querySelectorAll('.computer-item').forEach(item => {
-          item.addEventListener('click', function() {
-            const computerId = parseInt(this.dataset.computerId);
-            const roomId = parseInt(this.dataset.roomId);
-            const room = roomsData.find(r => r.id === roomId);
-            if (room) {
-              const computer = room.computers.find(c => c.id === computerId);
-              const isOnline = computer.online ?? (computer.status === 'online');
-              if (computer && isOnline) {
-                computer.selected = !computer.selected;
-                this.classList.toggle('selected');
-                const checkbox = this.querySelector('.computer-checkbox');
-                if (checkbox) checkbox.classList.toggle('checked');
-                updateSelectedCount();
-                updateDownloadAllButton(); // обновляем кнопку
-              }
-            }
-          });
-        });
-
-      }
-
-      
-      // Функция отрисовки готовых приложений
-      function renderApps() {
-        appsGrid.innerHTML = readyApps.map(app => `
-          <div class="app-card ${app.selected ? 'selected' : ''}" data-app-id="${app.id}">
-            <div class="app-header">
-              <div class="app-icon">
-                <i class="${app.icon}"></i>
-              </div>
-              <div class="app-info">
-                <h4 class="app-name">${app.name}</h4>
-                <div class="app-version">Версия ${app.version}</div>
-              </div>
-              <div class="app-checkbox ${app.selected ? 'checked' : ''}">
-              </div>
-            </div>
-            <div class="app-description">
-              ${app.description}
-            </div>
-            <div class="app-details">
-              <span class="app-size">${app.size}</span>
-            </div>
-            <button class="app-download-btn" data-app-name="${app.name}">
-              <i class="fas fa-download"></i> Скачать
-            </button>
-          </div>
-        `).join('');
-        
-        // Добавляем обработчики кликов для всей карточки приложения
-        appsGrid.querySelectorAll('.app-card').forEach(card => {
-          card.addEventListener('click', function(e) {
-            // Проверяем, не кликнули ли по кнопке скачивания или чекбоксу
-            if (!e.target.classList.contains('app-download-btn') && 
-                !e.target.classList.contains('app-checkbox')) {
-              const appId = parseInt(this.dataset.appId);
-              const app = readyApps.find(a => a.id === appId);
-              if (app) {
-                app.selected = !app.selected;
-                this.classList.toggle('selected');
-                const checkbox = this.querySelector('.app-checkbox');
-                checkbox.classList.toggle('checked');
-                updateDownloadAllButton();
-              }
-            }
-          });
-        });
-        
-        // Добавляем обработчики для кнопок скачивания отдельных приложений
-        appsGrid.querySelectorAll('.app-download-btn').forEach(button => {
-          button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Останавливаем всплытие, чтобы не сработал клик по карточке
-            const appName = this.dataset.appName;
-            downloadSingleApp(appName);
-          });
-        });
-      }
-      
-      // Функция обновления счетчика выбранных компьютеров
-      function updateSelectedCount() {
-        const selectedComputers = getSelectedComputers();
-        selectedCount.textContent = selectedComputers.length;
-      }
-      
-      // Функция обновления состояния кнопки скачивания всех файлов
-      function updateDownloadAllButton() {
-        const selectedComputers = getSelectedComputers();
-        const selectedApps = getSelectedApps();
-        const hasSelectedComputers = selectedComputers.length > 0;
-        const hasSelectedApps = selectedApps.length > 0;
-        
-        downloadAllBtn.disabled = !hasSelectedComputers || !hasSelectedApps;
-        selectedFilesCount.textContent = selectedApps.length;
-        selectedComputersCount.textContent = selectedComputers.length;
-        
-        if (hasSelectedComputers && hasSelectedApps) {
-          downloadAllBtn.innerHTML = `<i class="fas fa-download"></i> Скачать ${selectedApps.length} файлов на ${selectedComputers.length} выбранных компьютеров`;
-        } else {
-          downloadAllBtn.innerHTML = `<i class="fas fa-download"></i> Скачать файлы на выбранные компьютеры`;
-        }
-      }
-      
-      // Получить список выбранных компьютеров
-      function getSelectedComputers() {
-        return roomsData.flatMap(room => 
-          room.computers.filter(computer => computer.selected && (computer.online ?? computer.status === 'online'))
-        );
-      }
-      
-      // Получить список выбранных приложений
-      function getSelectedApps() {
-        return readyApps.filter(app => app.selected);
-      }
-      
-      // Получить все онлайн компьютеры
-      function getAllOnlineComputers() {
-        return roomsData.flatMap(room => 
-          room.computers.filter(computer => computer.online ?? computer.status === 'online')
-        );
-      }
-      
-      // Функция для скачивания одного приложения
-      function downloadSingleApp(appName) {
-        const app = readyApps.find(a => a.name === appName);
-        if (app) {
-          alert(`Начинается скачивание приложения: ${app.name} ${app.version}\nРазмер: ${app.size}`);
-          // В реальном приложении здесь был бы редирект на скачивание
-        }
-      }
-      
-      // Инициализация приложения
-      initApp();
     });
   </script>
 

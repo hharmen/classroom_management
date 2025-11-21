@@ -5,6 +5,10 @@
       "name": "PC-A1"
     },
     {
+      "id": 102,
+      "name": "PC-A2"
+    },
+    {
       "id": 201,
       "name": "PC-B1"
     }
@@ -14,6 +18,11 @@
       "id": 2,
       "name": "VLC Media Player",
       "version": "3.0.18"
+    },
+    {
+      "id": 3,
+      "name": "Google Chrome",
+      "version": "118.0"
     }
   ]
 }
