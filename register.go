@@ -78,7 +78,7 @@ func handler_reg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser, err := user.Current()
+	currentUser, _ := user.Current()
 
 	sshKeyPath := fmt.Sprintf("/home/%s/.ssh/ed25519.pub", currentUser.Username)
 
@@ -123,9 +123,4 @@ func handler_reg(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("ошибка сканирования файла с ключом: %s", err)
 	}
 
-}
-
-func main() {
-	http.HandleFunc("/api/register", handler_reg)
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }

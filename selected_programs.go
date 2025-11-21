@@ -25,11 +25,7 @@ type Payload struct {
 	Apps      []App      `json:"apps"`
 }
 
-func handleJSON(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
-		return
-	}
+func handle_select(w http.ResponseWriter, r *http.Request) {
 
 	var payload Payload
 
@@ -60,7 +56,7 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			cmd := exec.Command("ansible-playbook", "-i", "hosts.ini", "install_apps.yml", "-e", fmt.Sprintf("\"target_hosts=%s-%s\"", payload.Computers[i], roomName), "-e", fmt.Sprintf("install_programs={'%s':'%s'}", payload.Apps[j].Name, payload.Apps[j].Version))
+			cmd := exec.Command("ansible-playbook", "-i", "hosts.ini", "install_apps.yml", "-e", fmt.Sprintf("\"target_hosts=%s-%s\"", payload.Computers[i].Name, roomName), "-e", fmt.Sprintf("install_programs={'%s':'%s'}", payload.Apps[j].Name, payload.Apps[j].Version))
 
 			err = cmd.Run()
 			if err != nil {
@@ -74,10 +70,4 @@ func handleJSON(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"status": "успешно получено",
 	})
-}
-
-func main() {
-	http.HandleFunc("/save_selected", handleJSON)
-	fmt.Println("Сервер запущен на :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }

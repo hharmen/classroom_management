@@ -38,6 +38,15 @@ echo ">>> Копирую бинарник в $APP_DIR"
 sudo cp ./server "$APP_DIR/server"
 sudo chmod +x "$APP_DIR/server"
 
+if [ ! -d "./ansible" ]; then
+    echo "Ошибка: папка 'ansible' не найдена рядом с install.sh"
+    exit 1
+else
+    echo ">>> Копирую папку ansible в $APP_DIR"
+    sudo cp -r ./ansible "$APP_DIR/ansible"
+fi
+
+
 # --- 3. Создаём SQLite базу ---
 echo ">>> Создаю базу данных $DB_FILE"
 sudo bash -c "cat > $APP_DIR/install_db.sql" <<EOF
