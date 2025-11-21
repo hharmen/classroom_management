@@ -105,25 +105,39 @@ async function updatePageData() {
 }
 
 // --------------------------------------------
-// 3) Отправка selected.json через proxy
+// 3) 🔥 ИСПРАВЛЕННАЯ ФУНКЦИЯ: Отправка selected.json через proxy
 // --------------------------------------------
 async function sendSelectedToServer() {
-    console.log("📤 Отправляем selected.json на удалённый сервер...");
+    console.log("📤 Проверка данных для отправки на удалённый сервер...");
 
     try {
-        const response = await fetch('/save_selected', {
+        // 🔥 ПРОВЕРЯЕМ, ЕСТЬ ЛИ ВЫБРАННЫЕ ДАННЫЕ
+        const response = await fetch('/selected.json?t=' + Date.now());
+        const selectedData = await response.json();
+        
+        const hasComputers = selectedData.computers && selectedData.computers.length > 0;
+        const hasApps = selectedData.apps && selectedData.apps.length > 0;
+        
+        if (!hasComputers && !hasApps) {
+            console.log("⚠ Нет выбранных данных для отправки, просто переходим на Art2.html");
+            window.location.href = '/art2';
+            return;
+        }
+        
+        console.log("📤 Отправляем selected.json на удалённый сервер...");
+        const saveResponse = await fetch('/save_selected', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             }
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
+        if (!saveResponse.ok) {
+            const errorData = await saveResponse.json();
+            throw new Error(errorData.error || `Ошибка сервера: ${saveResponse.status}`);
         }
 
-        const result = await response.json();
+        const result = await saveResponse.json();
         console.log("✅ " + result.message);
         
         // 🔥 ВЫВОДИМ ИНФОРМАЦИЮ О СЕРВЕРЕ
@@ -134,14 +148,32 @@ async function sendSelectedToServer() {
             showNotification(result.message + serverInfo, 'success');
         }
         
+        // 🔥 ПЕРЕХОДИМ НА Art2.html ПОСЛЕ УСПЕШНОЙ ОТПРАВКИ
+        setTimeout(() => {
+            window.location.href = '/art2';
+        }, 1000);
+        
     } catch (err) {
         console.error("❌ Ошибка отправки selected.json:", err);
         showNotification(`Ошибка отправки selected.json: ${err.message}`, 'error');
+        
+        // 🔥 ВСЕ РАВНО ПЕРЕХОДИМ НА Art2.html ДАЖЕ ПРИ ОШИБКЕ
+        setTimeout(() => {
+            window.location.href = '/art2';
+        }, 2000);
     }
 }
 
 // --------------------------------------------
-// 4) Получение информации о сервере
+// 4) 🔥 НОВАЯ ФУНКЦИЯ: Простой переход на Art2 без отправки данных
+// --------------------------------------------
+function goToArt2Page() {
+    console.log("🔗 Переход на страницу выбора файлов...");
+    window.location.href = '/art2';
+}
+
+// --------------------------------------------
+// 5) Получение информации о сервере
 // --------------------------------------------
 async function getServerInfo() {
     try {
@@ -158,7 +190,7 @@ async function getServerInfo() {
 }
 
 // --------------------------------------------
-// 5) Вспомогательные функции
+// 6) Вспомогательные функции
 // --------------------------------------------
 function showNotification(message, type = 'info') {
     // Создаем элемент уведомления
@@ -218,7 +250,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 // --------------------------------------------
-// 6) Сохранение и восстановление состояния развертывания
+// 7) Сохранение и восстановление состояния развертывания
 // --------------------------------------------
 function saveExpandedState() {
     if (!window.roomsData) return null;
@@ -254,7 +286,7 @@ function restoreExpandedState(state) {
 }
 
 // --------------------------------------------
-// 7) Добавление кнопки синхронизации в интерфейс
+// 8) Добавление кнопки синхронизации в интерфейс
 // --------------------------------------------
 function addSyncButton() {
     // Проверяем, есть ли уже кнопка
@@ -289,8 +321,27 @@ function addSyncButton() {
 }
 
 // --------------------------------------------
-// 8) Автоматическая синхронизация при загрузке (ТОЛЬКО ДЛЯ Art.html)
+// 9) 🔥 ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ: Разные обработчики для разных страниц
 // --------------------------------------------
+function initializeArtPage() {
+    console.log("🎯 Инициализация страницы Art.html");
+    
+    // Находим кнопку загрузки файлов на Art.html
+    const uploadFilesBtn = document.getElementById('uploadFilesBtn');
+    if (uploadFilesBtn) {
+        // 🔥 ЗАМЕНЯЕМ ОБРАБОТЧИК - просто переход без отправки данных
+        uploadFilesBtn.onclick = goToArt2Page;
+        console.log("✅ Кнопка 'Загрузить файл на компьютеры' настроена на простой переход");
+    }
+}
+
+function initializeArt2Page() {
+    console.log("🎯 Инициализация страницы Art2.html");
+    
+    // На Art2.html оставляем старую логику для кнопки "Скачать файлы"
+    // так как там уже есть выбранные компьютеры и приложения
+}
+
 function shouldAutoSync() {
     // Автосинхронизация только для главной страницы Art.html
     // и только если данных еще нет или они устарели
@@ -323,31 +374,45 @@ document.addEventListener('DOMContentLoaded', function() {
     // Добавляем кнопки синхронизации
     addSyncButton();
     
-    // Автоматическая синхронизация только при необходимости
-    if (shouldAutoSync()) {
-        console.log("🔧 Запуск автоматической синхронизации...");
-        setTimeout(syncRooms, 1000);
-    } else {
-        console.log("⏭ Пропуск автоматической синхронизации");
+    // 🔥 РАЗДЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ДЛЯ РАЗНЫХ СТРАНИЦ
+    const isArtPage = window.location.pathname === '/' || 
+                     window.location.pathname === '/index.html' || 
+                     window.location.pathname === '/Art.html';
+    
+    const isArt2Page = window.location.pathname === '/art2';
+    
+    if (isArtPage) {
+        initializeArtPage();
         
-        // Просто обновляем статус подключения
-        const statusElement = document.getElementById('connectionStatus');
-        if (statusElement) {
-            statusElement.innerHTML = `
-                <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                <span>Подключено к серверу (данные загружены)</span>
-            `;
-            statusElement.className = 'connection-status connected';
+        // Автоматическая синхронизация только при необходимости
+        if (shouldAutoSync()) {
+            console.log("🔧 Запуск автоматической синхронизации...");
+            setTimeout(syncRooms, 1000);
+        } else {
+            console.log("⏭ Пропуск автоматической синхронизации");
+            
+            // Просто обновляем статус подключения
+            const statusElement = document.getElementById('connectionStatus');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                    <span>Подключено к серверу (данные загружены)</span>
+                `;
+                statusElement.className = 'connection-status connected';
+            }
         }
+    } else if (isArt2Page) {
+        initializeArt2Page();
     }
 });
 
 // --------------------------------------------
-// 9) Глобальные функции для вызова из других скриптов
+// 10) Глобальные функции для вызова из других скриптов
 // --------------------------------------------
 window.syncRooms = syncRooms;
 window.sendSelectedToServer = sendSelectedToServer;
 window.showNotification = showNotification;
 window.updatePageData = updatePageData;
+window.goToArt2Page = goToArt2Page;
 
 console.log("✅ sync.js инициализирован");

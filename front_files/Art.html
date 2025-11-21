@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="ru">
   <head>
     <meta charset="UTF-8">
@@ -519,32 +519,17 @@
         let isConnected = false;
         let isAllExpanded = false;
 
-        // Обработчик кнопки загрузки файлов
+        // 🔥 ИСПРАВЛЕННЫЙ ОБРАБОТЧИК КНОПКИ ЗАГРУЗКИ ФАЙЛОВ
         uploadFilesBtn.addEventListener('click', function() {
           if (!isConnected) {
             alert('Нет подключения к серверу');
             return;
           }
 
-          // Собираем все выбранные компьютеры (можно адаптировать под твою логику)
-          const selectedComputers = roomsData.flatMap(room =>
-            room.computers.filter(c => c.expanded).map(c => ({ id: c.id, name: c.name, ip: c.ip }))
-          );
-
-          fetch('save_selected', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ computers: selectedComputers, apps: [] })
-          })
-          .then(() => {
-            window.location.href = '/art2';
-          })
-          .catch(err => {
-            console.error('Ошибка сохранения selected.json:', err);
-            alert('Не удалось сохранить выбранные данные');
-          });
+          // 🔥 ПРОСТО ПЕРЕХОДИМ НА СТРАНИЦУ Art2.html БЕЗ ОТПРАВКИ ДАННЫХ
+          console.log('🔗 Переход на страницу выбора файлов...');
+          window.location.href = '/art2';
         });
-
 
         // Имитация подключения к серверу
         function connectToServer() {
@@ -598,12 +583,7 @@
               console.error('Ошибка загрузки rooms.json:', err);
               alert('Не удалось загрузить данные комнат. Проверьте наличие файла rooms.json и правильность пути.');
             });
-
-
-
-
         }
-
 
         // Показать сообщение об ошибке
         function showErrorMessage(message) {
