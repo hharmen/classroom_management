@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type FileInfo struct {

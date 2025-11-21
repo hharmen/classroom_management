@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/user"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type RequestData struct {

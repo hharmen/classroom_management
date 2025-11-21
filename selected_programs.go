@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Computer struct {
