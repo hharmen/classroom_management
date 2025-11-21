@@ -308,16 +308,9 @@ function addSyncButton() {
         headerButtons.appendChild(syncButton);
     }
     
-    // Для страницы Art2.html добавляем кнопку в другой раздел
-    const roomsControls = document.querySelector('.rooms-controls');
-    if (roomsControls && !document.getElementById('syncButtonArt2')) {
-        const syncButtonArt2 = document.createElement('button');
-        syncButtonArt2.id = 'syncButtonArt2';
-        syncButtonArt2.innerHTML = '<i class="fas fa-sync-alt"></i> Синхронизировать';
-        syncButtonArt2.className = 'control-btn control-btn-primary';
-        syncButtonArt2.onclick = syncRooms;
-        roomsControls.appendChild(syncButtonArt2);
-    }
+    // 🔥 УДАЛЕНО: Создание дополнительной кнопки для Art2.html
+    // Для страницы Art2.html НЕ добавляем кнопку в rooms-controls
+    // чтобы избежать дублирования
 }
 
 // --------------------------------------------
