@@ -8,11 +8,14 @@ read -p "Введите ComputerID: " COMPUTER_ID
 read -p "Введите Ip сервера: " SERVER_URL
 read -p "Введите Port для подключения к серверу: " SERVER_PORT
 
-if [ ! -f ./computer-agent ]; then
-    echo "❌ Бинарник 'computer-agent' не найден!"
+
+
+if [ ! -f ./computer-agent.go ]; then
+    echo "❌ Файл 'computer-agent.go' не найден!"
     exit 1
 fi
 
+go build ./computer-agent.go
 
 sudo mkdir -p /etc/computer-agent
 sudo mkdir -p /var/log/computer-agent
