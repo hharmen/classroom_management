@@ -44,7 +44,7 @@ def get_rooms():
                     "id": 102,
                     "name": "PC-A2",
                     "ip": "192.168.0.102",
-                    "status": "offline",
+                    "status": "online",
                     "expanded": False,
                     "lastActive": "2025-11-19 12:00",
                     "files": []
