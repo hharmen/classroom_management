@@ -1,0 +1,105 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const backBtn = document.getElementById('backBtn');
+    const selectAllAppsBtn = document.getElementById('selectAllAppsBtn');
+
+    // Обработчик кнопки "Назад"
+    backBtn.addEventListener('click', function() {
+        window.location.href = './';
+    });
+
+    // Обработчик кнопки "Выбрать все приложения"
+    selectAllAppsBtn.addEventListener('click', function() {
+        if (!window.readyApps || window.readyApps.length === 0) {
+            console.log("Нет данных о приложениях");
+            return;
+        }
+        
+        const allSelected = window.readyApps.every(app => app.selected);
+        
+        window.readyApps.forEach(app => {
+            app.selected = !allSelected;
+        });
+        
+        if (window.renderAppsArt2) {
+            window.renderAppsArt2();
+        }
+        if (window.updateDownloadAllButtonArt2) {
+            window.updateDownloadAllButtonArt2();
+        }
+    });
+
+    // Загрузка данных комнат
+    function loadRoomsData() {
+        fetch('rooms.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка загрузки rooms.json');
+                return response.json();
+            })
+            .then(data => {
+                window.roomsData = data;
+                
+                // Инициализируем свойство selected для компьютеров
+                if (window.roomsData && Array.isArray(window.roomsData)) {
+                    window.roomsData.forEach(room => {
+                        if (room.computers && Array.isArray(room.computers)) {
+                            room.computers.forEach(computer => {
+                                if (computer.selected === undefined) {
+                                    computer.selected = false;
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                if (window.renderRoomsArt2) window.renderRoomsArt2();
+                if (window.updateSelectedCountArt2) window.updateSelectedCountArt2();
+                if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
+            })
+            .catch(err => {
+                console.error('Ошибка загрузки rooms.json:', err);
+                document.getElementById('roomsGrid').innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Ошибка загрузки данных комнат
+                    </div>
+                `;
+            });
+    }
+
+    // Загрузка данных приложений
+    function loadAppsData() {
+        fetch('apps.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка загрузки apps.json');
+                return response.json();
+            })
+            .then(data => {
+                window.readyApps = data;
+                
+                // Инициализируем свойство selected для приложений
+                if (window.readyApps && Array.isArray(window.readyApps)) {
+                    window.readyApps.forEach(app => {
+                        if (app.selected === undefined) {
+                            app.selected = false;
+                        }
+                    });
+                }
+                
+                if (window.renderAppsArt2) window.renderAppsArt2();
+                if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
+            })
+            .catch(err => {
+                console.error('Ошибка загрузки apps.json:', err);
+                document.getElementById('appsGrid').innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Ошибка загрузки данных приложений
+                    </div>
+                `;
+            });
+    }
+
+    // Загружаем данные
+    loadRoomsData();
+    loadAppsData();
+});

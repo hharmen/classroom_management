@@ -1,11 +1,5 @@
-// sync.js
-// Упрощенная версия - работает через proxy на основном сервере
-
-// --------------------------------------------
-// 1) Синхронизация комнат через proxy
-// --------------------------------------------
 async function syncRooms() {
-    console.log("🔄 Синхронизация комнат с удалённым сервером...");
+    console.log("Синхронизация комнат с удалённым сервером...");
     
     const statusElement = document.getElementById('connectionStatus');
     if (statusElement) {
@@ -29,9 +23,8 @@ async function syncRooms() {
         }
         
         const result = await response.json();
-        console.log("✅ " + result.message);
-        
-        // Обновляем статус подключения
+        console.log(result.message);
+
         if (statusElement) {
             statusElement.innerHTML = `
                 <i class="fas fa-check-circle" style="color: #28a745;"></i>
@@ -40,17 +33,13 @@ async function syncRooms() {
             statusElement.className = 'connection-status connected';
         }
         
-        // Показываем уведомление об успехе с информацией о сервере
         const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
         showNotification(result.message + serverInfo, 'success');
         
-        // Обновляем данные на странице без перезагрузки
         updatePageData();
         
     } catch (err) {
-        console.error("❌ Ошибка синхронизации:", err);
-        
-        // Обновляем статус подключения
+        console.error("Ошибка синхронизации:", err);
         if (statusElement) {
             statusElement.innerHTML = `
                 <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
@@ -63,52 +52,40 @@ async function syncRooms() {
     }
 }
 
-// --------------------------------------------
-// 2) Обновление данных на странице без перезагрузки
-// --------------------------------------------
 async function updatePageData() {
-    console.log("📊 Обновление данных на странице...");
+    console.log("Обновление данных на странице...");
     
     try {
-        // Загружаем обновленные данные
         const response = await fetch('/rooms');
         if (!response.ok) {
             throw new Error('Не удалось загрузить обновленные данные');
         }
         
         const roomsData = await response.json();
-        console.log("✅ Получены обновленные данные:", roomsData);
+        console.log("Получены обновленные данные:", roomsData);
         
-        // Обновляем таблицу на странице Art.html
         if (typeof renderNestedTable === 'function') {
-            // Сохраняем текущее состояние развертывания
             const currentExpandedState = saveExpandedState();
             
-            // Обновляем данные
             window.roomsData = roomsData;
             
-            // Восстанавливаем состояние развертывания
             restoreExpandedState(currentExpandedState);
             
-            // Перерисовываем таблицу
             renderNestedTable();
             
             showNotification('Данные успешно обновлены', 'success');
         } else {
-            console.log("⚠ Функция renderNestedTable не найдена, возможно это не страница Art.html");
+            console.log("Функция renderNestedTable не найдена, возможно это не страница Art.html");
         }
         
     } catch (err) {
-        console.error("❌ Ошибка обновления данных:", err);
+        console.error("Ошибка обновления данных:", err);
         showNotification('Ошибка обновления данных: ' + err.message, 'error');
     }
 }
 
-// --------------------------------------------
-// 3) 🔥 ИСПРАВЛЕННАЯ ФУНКЦИЯ: Отправка selected.json через proxy
-// --------------------------------------------
 async function sendSelectedToServer() {
-    console.log("📤 Проверка данных для отправки на удалённый сервер...");
+    console.log("Проверка данных для отправки на удалённый сервер...");
 
     try {
         // 🔥 ПРОВЕРЯЕМ, ЕСТЬ ЛИ ВЫБРАННЫЕ ДАННЫЕ
@@ -119,12 +96,12 @@ async function sendSelectedToServer() {
         const hasApps = selectedData.apps && selectedData.apps.length > 0;
         
         if (!hasComputers && !hasApps) {
-            console.log("⚠ Нет выбранных данных для отправки, просто переходим на Art2.html");
+            console.log("Нет выбранных данных для отправки, просто переходим на Art2.html");
             window.location.href = '/art2';
             return;
         }
         
-        console.log("📤 Отправляем selected.json на удалённый сервер...");
+        console.log("Отправляем selected.json на удалённый сервер...");
         const saveResponse = await fetch('/save_selected', {
             method: 'POST',
             headers: {
@@ -138,9 +115,8 @@ async function sendSelectedToServer() {
         }
 
         const result = await saveResponse.json();
-        console.log("✅ " + result.message);
+        console.log(result.message);
         
-        // 🔥 ВЫВОДИМ ИНФОРМАЦИЮ О СЕРВЕРЕ
         const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
         if (result.remote_response && result.remote_response.saved_to_file) {
             showNotification(`${result.message} - сохранено в ${result.remote_response.saved_to_file}${serverInfo}`, 'success');
@@ -148,33 +124,25 @@ async function sendSelectedToServer() {
             showNotification(result.message + serverInfo, 'success');
         }
         
-        // 🔥 ПЕРЕХОДИМ НА Art2.html ПОСЛЕ УСПЕШНОЙ ОТПРАВКИ
         setTimeout(() => {
             window.location.href = '/art2';
         }, 1000);
         
     } catch (err) {
-        console.error("❌ Ошибка отправки selected.json:", err);
+        console.error("Ошибка отправки selected.json:", err);
         showNotification(`Ошибка отправки selected.json: ${err.message}`, 'error');
         
-        // 🔥 ВСЕ РАВНО ПЕРЕХОДИМ НА Art2.html ДАЖЕ ПРИ ОШИБКЕ
         setTimeout(() => {
             window.location.href = '/art2';
         }, 2000);
     }
 }
 
-// --------------------------------------------
-// 4) 🔥 НОВАЯ ФУНКЦИЯ: Простой переход на Art2 без отправки данных
-// --------------------------------------------
 function goToArt2Page() {
-    console.log("🔗 Переход на страницу выбора файлов...");
+    console.log("Переход на страницу выбора файлов...");
     window.location.href = '/art2';
 }
 
-// --------------------------------------------
-// 5) Получение информации о сервере
-// --------------------------------------------
 async function getServerInfo() {
     try {
         const response = await fetch('/server_info');
@@ -184,14 +152,11 @@ async function getServerInfo() {
             return info;
         }
     } catch (err) {
-        console.log("⚠ Не удалось получить информацию о сервере");
+        console.log("Не удалось получить информацию о сервере");
     }
     return null;
 }
 
-// --------------------------------------------
-// 6) Вспомогательные функции
-// --------------------------------------------
 function showNotification(message, type = 'info') {
     // Создаем элемент уведомления
     const notification = document.createElement('div');
@@ -224,7 +189,6 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Удаляем уведомление через 5 секунд
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => {
@@ -235,7 +199,7 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// Добавляем стили для анимаций
+
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -249,9 +213,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// --------------------------------------------
-// 7) Сохранение и восстановление состояния развертывания
-// --------------------------------------------
 function saveExpandedState() {
     if (!window.roomsData) return null;
     
@@ -285,11 +246,7 @@ function restoreExpandedState(state) {
     });
 }
 
-// --------------------------------------------
-// 8) 🔥 ИСПРАВЛЕННАЯ ФУНКЦИЯ: Добавление кнопки синхронизации в интерфейс
-// --------------------------------------------
 function addSyncButton() {
-    // Проверяем, есть ли уже кнопка
     if (document.getElementById('syncButton')) {
         return;
     }
@@ -301,8 +258,7 @@ function addSyncButton() {
     syncButton.className = 'btn btn-warning header-button';
     syncButton.style.marginLeft = '10px';
     syncButton.onclick = syncRooms;
-    
-    // 🔥 ИСПРАВЛЕНО: Добавляем кнопку в заголовок ТОЛЬКО на главной странице
+
     const isMainPage = window.location.pathname === '/' || 
                       window.location.pathname === '/index.html' || 
                       window.location.pathname === '/Art.html';
@@ -313,36 +269,30 @@ function addSyncButton() {
             headerButtons.appendChild(syncButton);
         }
     }
-    
-    // 🔥 УДАЛЕНО: Создание дополнительной кнопки для Art2.html
-    // чтобы избежать дублирования маленькой кнопки в секции компьютеров
 }
 
-// --------------------------------------------
-// 9) 🔥 ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ: Разные обработчики для разных страниц
-// --------------------------------------------
+
+// Разные обработчики для разных страниц
+
 function initializeArtPage() {
-    console.log("🎯 Инициализация страницы Art.html");
+    console.log("Инициализация страницы Art.html");
     
     // Находим кнопку загрузки файлов на Art.html
     const uploadFilesBtn = document.getElementById('uploadFilesBtn');
     if (uploadFilesBtn) {
-        // 🔥 ЗАМЕНЯЕМ ОБРАБОТЧИК - просто переход без отправки данных
         uploadFilesBtn.onclick = goToArt2Page;
-        console.log("✅ Кнопка 'Загрузить файл на компьютеры' настроена на простой переход");
+        console.log("Кнопка 'Загрузить файл на компьютеры' настроена на простой переход");
     }
 }
 
 function initializeArt2Page() {
-    console.log("🎯 Инициализация страницы Art2.html");
+    console.log("Инициализация страницы Art2.html");
     
-    // 🔥 ИСПРАВЛЕННЫЙ КОД ДЛЯ Art2.html
     const selectAllBtn = document.getElementById('selectAllBtn');
     const refreshRoomsBtn = document.getElementById('refreshRooms');
     const downloadAllBtn = document.getElementById('downloadAllBtn');
     
     if (selectAllBtn) {
-        // 🔥 ИСПРАВЛЕННЫЙ ОБРАБОТЧИК ДЛЯ КНОПКИ "ВЫБРАТЬ ВСЕ"
         selectAllBtn.addEventListener('click', function() {
             const allOnlineComputers = getAllOnlineComputers();
             const currentlySelected = getSelectedComputers().length;
@@ -356,9 +306,9 @@ function initializeArt2Page() {
                 });
             });
             
-            renderRoomsArt2();
-            updateSelectedCountArt2();
-            updateDownloadAllButtonArt2();
+            if (window.renderRoomsArt2) window.renderRoomsArt2();
+            if (window.updateSelectedCountArt2) window.updateSelectedCountArt2();
+            if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
         });
     }
     
@@ -432,7 +382,7 @@ function initializeArt2Page() {
     }
 }
 
-// 🔥 ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ Art2.html
+// Вспомогательные функции
 function getAllOnlineComputers() {
     if (!window.roomsData) return [];
     return window.roomsData.flatMap(room => 
@@ -615,7 +565,6 @@ function downloadSingleApp(appName) {
 
 function shouldAutoSync() {
     // Автосинхронизация только для главной страницы Art.html
-    // и только если данных еще нет или они устарели
     const isMainPage = window.location.pathname === '/' || 
                       window.location.pathname === '/index.html' || 
                       window.location.pathname === '/Art.html';
@@ -625,7 +574,7 @@ function shouldAutoSync() {
     // Проверяем, есть ли уже данные на странице
     const nestedTable = document.getElementById('nestedTable');
     if (nestedTable && nestedTable.querySelector('.room-row')) {
-        console.log("📊 Данные уже загружены, пропускаем автосинхронизацию");
+        console.log("Данные уже загружены, пропускаем автосинхронизацию");
         return false;
     }
     
@@ -633,19 +582,19 @@ function shouldAutoSync() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("🚀 sync.js загружен");
+    console.log("sync.js загружен");
     
     // Получаем информацию о сервере
     getServerInfo().then(info => {
         if (info) {
-            console.log(`📡 Настроен удаленный сервер: ${info.remote_server}`);
+            console.log(`Настроен удаленный сервер: ${info.remote_server}`);
         }
     });
     
     // Добавляем кнопки синхронизации
     addSyncButton();
     
-    // 🔥 РАЗДЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ДЛЯ РАЗНЫХ СТРАНИЦ
+    // Раздельная инициализация страниц
     const isArtPage = window.location.pathname === '/' || 
                      window.location.pathname === '/index.html' || 
                      window.location.pathname === '/Art.html';
@@ -677,16 +626,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// --------------------------------------------
-// 10) Глобальные функции для вызова из других скриптов
-// --------------------------------------------
+// Глобальные функции
 window.syncRooms = syncRooms;
 window.sendSelectedToServer = sendSelectedToServer;
 window.showNotification = showNotification;
 window.updatePageData = updatePageData;
 window.goToArt2Page = goToArt2Page;
 
-// 🔥 ДОБАВЛЕНЫ ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ Art2.html
+// Глобальные функции для Art2.html
 window.getAllOnlineComputers = getAllOnlineComputers;
 window.getSelectedComputers = getSelectedComputers;
 window.getSelectedApps = getSelectedApps;
@@ -695,4 +642,4 @@ window.renderAppsArt2 = renderAppsArt2;
 window.updateSelectedCountArt2 = updateSelectedCountArt2;
 window.updateDownloadAllButtonArt2 = updateDownloadAllButtonArt2;
 
-console.log("✅ sync.js инициализирован");
+console.log("sync.js инициализирован");
