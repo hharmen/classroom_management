@@ -1,12 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Элементы DOM
     const nestedTable = document.getElementById('nestedTable');
     const connectionStatus = document.getElementById('connectionStatus');
     const refreshBtn = document.getElementById('refreshTable');
     const toggleExpandBtn = document.getElementById('toggleExpandBtn');
     const uploadFilesBtn = document.getElementById('uploadFilesBtn');
-    
-    // Данные приложения (изначально пустые)
+
     let roomsData = [];
     let isConnected = false;
     let isAllExpanded = false;
@@ -17,34 +15,29 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
         }
 
-        // Переходим на страницу
         console.log('🔗 Переход на страницу выбора файлов...');
         window.location.href = '/art2';
     });
 
-    // Имитация подключения к серверу
     function connectToServer() {
-        console.log('🔄 Подключение к серверу...');
+        console.log('Подключение к серверу...');
 
         setTimeout(() => {
-        console.log('✅ Подключение установлено');
+        console.log('Подключение установлено');
         isConnected = true;
         connectionStatus.innerHTML = `
             <i class="fas fa-check-circle" style="color: #28a745;"></i>
             <span>Подключено к серверу</span>
         `;
         connectionStatus.className = 'connection-status connected';
-        
-        // После подключения запрашиваем данные
+
         loadDataFromServer();
         }, 2000);
     }
-    
-    // Функция для загрузки данных из rooms.json
+
     function loadDataFromServer() {
         console.log('📥 Загрузка данных из rooms.json...');
-        
-        // Показываем сообщение о загрузке
+
         nestedTable.innerHTML = `
         <div class="loading-message">
             <div class="spinner"></div>
@@ -59,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            // Проверяем: если data массив — используем напрямую, если объект с ключом "rooms" — берем data.rooms
             if (Array.isArray(data)) {
             roomsData = data;
             } else if (data.rooms && Array.isArray(data.rooms)) {
@@ -67,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
             throw new Error('Некорректный формат rooms.json');
             }
-            renderNestedTable(); // отрисовка таблицы
+            renderNestedTable();
         })
         .catch(err => {
             console.error('Ошибка загрузки rooms.json:', err);
@@ -75,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Показать сообщение об ошибке
     function showErrorMessage(message) {
         connectionStatus.innerHTML = `
         <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
@@ -92,12 +83,9 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
-    // Инициализация приложения
     function initApp() {
-        // Начинаем подключение к серверу
         connectToServer();
-        
-        // Обработчики кнопок таблицы
+
         refreshBtn.addEventListener('click', function() {
         if (!isConnected) {
             alert('Нет подключения к серверу');
@@ -105,8 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         loadDataFromServer();
         });
-        
-        // Обработчик переключения развертывания/свертывания
+
         toggleExpandBtn.addEventListener('click', function() {
         if (roomsData.length === 0) {
             alert('Данные еще не загружены');
@@ -121,8 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
             computer.expanded = isAllExpanded;
             });
         });
-        
-        // Обновляем состояние кнопки
+
         if (isAllExpanded) {
             toggleExpandBtn.classList.add('expanded');
         } else {
@@ -133,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Функция отрисовки вложенной таблицы
     function renderNestedTable() {
         if (roomsData.length === 0) {
         nestedTable.innerHTML = `
@@ -226,8 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         ` : ''}
         `).join('');
-        
-        // Добавляем обработчики кликов для разворачивания/сворачивания
+
         nestedTable.querySelectorAll('.room-row').forEach(row => {
         row.addEventListener('click', function() {
             const roomId = parseInt(this.dataset.roomId);
@@ -251,8 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         });
     }
-    
-    // Вспомогательные функции
+
     function getFileIcon(fileType) {
         const icons = {
         'PDF документ': '-pdf',
@@ -286,7 +269,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function getTotalFilesInRoom(room) {
         return room.computers.reduce((total, computer) => total + computer.files.length, 0);
     }
-    
-    // Инициализация приложения
+
     initApp();
     });

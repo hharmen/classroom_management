@@ -88,7 +88,6 @@ async function sendSelectedToServer() {
     console.log("Проверка данных для отправки на удалённый сервер...");
 
     try {
-        // 🔥 ПРОВЕРЯЕМ, ЕСТЬ ЛИ ВЫБРАННЫЕ ДАННЫЕ
         const response = await fetch('/selected.json?t=' + Date.now());
         const selectedData = await response.json();
         
@@ -148,7 +147,7 @@ async function getServerInfo() {
         const response = await fetch('/server_info');
         if (response.ok) {
             const info = await response.json();
-            console.log("📡 Информация о сервере:", info);
+            console.log("Информация о сервере:", info);
             return info;
         }
     } catch (err) {
@@ -158,7 +157,6 @@ async function getServerInfo() {
 }
 
 function showNotification(message, type = 'info') {
-    // Создаем элемент уведомления
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
@@ -250,8 +248,7 @@ function addSyncButton() {
     if (document.getElementById('syncButton')) {
         return;
     }
-    
-    // Создаем кнопку синхронизации
+
     const syncButton = document.createElement('button');
     syncButton.id = 'syncButton';
     syncButton.innerHTML = '<i class="fas fa-sync-alt"></i> Синхронизировать';
@@ -272,12 +269,9 @@ function addSyncButton() {
 }
 
 
-// Разные обработчики для разных страниц
-
 function initializeArtPage() {
     console.log("Инициализация страницы Art.html");
-    
-    // Находим кнопку загрузки файлов на Art.html
+
     const uploadFilesBtn = document.getElementById('uploadFilesBtn');
     if (uploadFilesBtn) {
         uploadFilesBtn.onclick = goToArt2Page;
@@ -314,11 +308,9 @@ function initializeArt2Page() {
     
     if (refreshRoomsBtn) {
         refreshRoomsBtn.addEventListener('click', function() {
-            // Имитируем обновление статусов компьютеров
             window.roomsData.forEach(room => {
                 room.computers.forEach(computer => {
-                    if (Math.random() > 0.7) {
-                        // Меняем статус для демонстрации
+                    if (Math.random() > 1) {
                         computer.status = computer.status === 'online' ? 'offline' : 'online';
                         if (computer.status === 'offline') {
                             computer.selected = false;
@@ -364,8 +356,7 @@ function initializeArt2Page() {
             })
             .then(data => {
                 alert(data.message || 'Выбор сохранён в selected.json');
-                
-                // Сбрасываем выбор
+
                 window.roomsData.forEach(room => room.computers.forEach(c => c.selected = false));
                 window.readyApps.forEach(a => a.selected = false);
                 
@@ -382,7 +373,6 @@ function initializeArt2Page() {
     }
 }
 
-// Вспомогательные функции
 function getAllOnlineComputers() {
     if (!window.roomsData) return [];
     return window.roomsData.flatMap(room => 
@@ -445,7 +435,6 @@ function renderRoomsArt2() {
         </div>
     `).join('');
 
-    // Добавляем обработчики кликов для всей области компьютера
     roomsGrid.querySelectorAll('.computer-item').forEach(item => {
         item.addEventListener('click', function() {
             const computerId = parseInt(this.dataset.computerId);
@@ -495,8 +484,7 @@ function renderAppsArt2() {
             </button>
         </div>
     `).join('');
-    
-    // Добавляем обработчики кликов для всей карточки приложения
+
     appsGrid.querySelectorAll('.app-card').forEach(card => {
         card.addEventListener('click', function(e) {
             if (!e.target.classList.contains('app-download-btn') && 
@@ -513,8 +501,7 @@ function renderAppsArt2() {
             }
         });
     });
-    
-    // Добавляем обработчики для кнопок скачивания отдельных приложений
+
     appsGrid.querySelectorAll('.app-download-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -564,14 +551,12 @@ function downloadSingleApp(appName) {
 }
 
 function shouldAutoSync() {
-    // Автосинхронизация только для главной страницы Art.html
     const isMainPage = window.location.pathname === '/' || 
                       window.location.pathname === '/index.html' || 
                       window.location.pathname === '/Art.html';
     
     if (!isMainPage) return false;
-    
-    // Проверяем, есть ли уже данные на странице
+
     const nestedTable = document.getElementById('nestedTable');
     if (nestedTable && nestedTable.querySelector('.room-row')) {
         console.log("Данные уже загружены, пропускаем автосинхронизацию");
@@ -583,18 +568,15 @@ function shouldAutoSync() {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("sync.js загружен");
-    
-    // Получаем информацию о сервере
+
     getServerInfo().then(info => {
         if (info) {
             console.log(`Настроен удаленный сервер: ${info.remote_server}`);
         }
     });
-    
-    // Добавляем кнопки синхронизации
+
     addSyncButton();
-    
-    // Раздельная инициализация страниц
+
     const isArtPage = window.location.pathname === '/' || 
                      window.location.pathname === '/index.html' || 
                      window.location.pathname === '/Art.html';
@@ -603,15 +585,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (isArtPage) {
         initializeArtPage();
-        
-        // Автоматическая синхронизация только при необходимости
+
         if (shouldAutoSync()) {
-            console.log("🔧 Запуск автоматической синхронизации...");
+            console.log("Запуск автоматической синхронизации...");
             setTimeout(syncRooms, 1000);
         } else {
-            console.log("⏭ Пропуск автоматической синхронизации");
-            
-            // Просто обновляем статус подключения
+            console.log("Пропуск автоматической синхронизации");
+
             const statusElement = document.getElementById('connectionStatus');
             if (statusElement) {
                 statusElement.innerHTML = `

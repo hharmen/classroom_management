@@ -2,12 +2,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('backBtn');
     const selectAllAppsBtn = document.getElementById('selectAllAppsBtn');
 
-    // Обработчик кнопки "Назад"
     backBtn.addEventListener('click', function() {
         window.location.href = './';
     });
 
-    // Обработчик кнопки "Выбрать все приложения"
     selectAllAppsBtn.addEventListener('click', function() {
         if (!window.readyApps || window.readyApps.length === 0) {
             console.log("Нет данных о приложениях");
@@ -28,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Загрузка данных комнат
     function loadRoomsData() {
         fetch('rooms.json')
             .then(response => {
@@ -37,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 window.roomsData = data;
-                
-                // Инициализируем свойство selected для компьютеров
+
                 if (window.roomsData && Array.isArray(window.roomsData)) {
                     window.roomsData.forEach(room => {
                         if (room.computers && Array.isArray(room.computers)) {
@@ -66,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Загрузка данных приложений
     function loadAppsData() {
         fetch('apps.json')
             .then(response => {
@@ -75,8 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 window.readyApps = data;
-                
-                // Инициализируем свойство selected для приложений
+
                 if (window.readyApps && Array.isArray(window.readyApps)) {
                     window.readyApps.forEach(app => {
                         if (app.selected === undefined) {
@@ -99,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Загружаем данные
     loadRoomsData();
     loadAppsData();
 });

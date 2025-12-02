@@ -9,7 +9,7 @@ ROOMS_FILE = 'rooms.json'
 APPS_FILE = 'apps.json'
 SELECTED_FILE = 'selected.json'
 
-REMOTE_SERVER_URL = "http://127.0.0.2:6000"  # Айпишка 
+REMOTE_SERVER_URL = "http://88.218.121.7:6000"  # Айпишка 
 
 @app.route('/')
 def index():
@@ -35,8 +35,6 @@ def get_rooms():
         data = json.load(f)
     return jsonify(data)
 
-
-# Локальный маршрут json
 @app.route('/update_rooms', methods=['POST'])
 def update_rooms():
     data = request.get_json()
@@ -49,8 +47,6 @@ def update_rooms():
 
     return jsonify({"message": "rooms.json обновлён"}), 200
 
-#  API: selected.json
-
 @app.route('/save_selected', methods=['POST'])
 def save_selected():
     data = request.get_json()
@@ -58,11 +54,9 @@ def save_selected():
     if not data:
         return jsonify({"error": "Нет данных"}), 400
 
-    # Сохраняем локально
     with open(SELECTED_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # Отправка данных на сервер
     try:
         print(f"Отправка данных на удаленный сервер: {REMOTE_SERVER_URL}")
         response = requests.post(
@@ -99,22 +93,18 @@ def save_selected():
         }), 200
 
 
-# Синхронизация через proxy
-
 @app.route('/sync_rooms', methods=['GET', 'POST'])
 def sync_rooms():
     """Прокси для синхронизации с удаленным сервером"""
     try:
         print(f"Синхронизация с удаленным сервером: {REMOTE_SERVER_URL}")
-        
-        # Получаем данные с удаленного сервера
+
         response = requests.get(f'{REMOTE_SERVER_URL}/get_rooms', timeout=10)
         response.raise_for_status()
         remote_data = response.json()
         
         print(f"Получены данные с удаленного сервера: {len(remote_data)} комнат")
-        
-        # Сохраняем локально
+
         with open(ROOMS_FILE, 'w', encoding='utf-8') as f:
             json.dump(remote_data, f, ensure_ascii=False, indent=2)
             
@@ -127,7 +117,7 @@ def sync_rooms():
         }), 200
         
     except requests.exceptions.ConnectionError:
-        error_msg = f"Не удалось подключиться к удаленному серверу {REMOTE_SERVER_URL}. Убедитесь, что сервер запущен."
+        error_msg = f"Не удалось подключиться к удаленному серверу {REMOTE_SERVER_URL}."
         print(f"{error_msg}")
         return jsonify({
             "error": error_msg,
@@ -148,22 +138,18 @@ def sync_rooms():
             "remote_server": REMOTE_SERVER_URL
         }), 500
 
-#  Отправка selected.json через proxy
-
 @app.route('/sync_selected', methods=['POST'])
 def sync_selected():
     """Прокси для отправки selected.json на удаленный сервер"""
     try:
         print(f"Отправка selected.json на удаленный сервер: {REMOTE_SERVER_URL}")
-        
-        # Читаем локальный selected.json
+
         if not os.path.exists(SELECTED_FILE):
             return jsonify({"error": "selected.json не найден"}), 404
             
         with open(SELECTED_FILE, 'r', encoding='utf-8') as f:
             selected_data = json.load(f)
-        
-        # Отправляем на удаленный сервер
+
         response = requests.post(
             f'{REMOTE_SERVER_URL}/receive_selected', 
             json=selected_data,
@@ -188,9 +174,6 @@ def sync_selected():
             "remote_server": REMOTE_SERVER_URL
         }), 500
 
-#Информация о конфигурации
-
-
 @app.route('/server_info', methods=['GET'])
 def server_info():
     """Возвращает информацию о настройках сервера"""
@@ -206,8 +189,7 @@ def server_info():
     }), 200
 
 
-#  Запуск сервера
-
+# запуск сервера
 if __name__ == '__main__':
     print("Основной сервер запущен на http://localhost:5000")
     print(f"Удаленный сервер: {REMOTE_SERVER_URL}")
