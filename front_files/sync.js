@@ -52,6 +52,60 @@ async function syncRooms() {
     }
 }
 
+async function syncAllData() {
+    console.log("Синхронизация всех данных с удалённым сервером...");
+    
+    const statusElement = document.getElementById('connectionStatus');
+    if (statusElement) {
+        statusElement.innerHTML = `
+            <div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+            <span>Синхронизация всех данных...</span>
+        `;
+    }
+
+    try {
+        const response = await fetch('/sync_all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log(result.message);
+
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                <span>${result.message}</span>
+            `;
+            statusElement.className = 'connection-status connected';
+        }
+        
+        const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
+        showNotification(result.message + serverInfo, 'success');
+        
+        updateAllPageData();
+        
+    } catch (err) {
+        console.error("Ошибка синхронизации всех данных:", err);
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                <span>Ошибка синхронизации: ${err.message}</span>
+            `;
+            statusElement.className = 'connection-status error';
+        }
+        
+        showNotification(`Ошибка синхронизации: ${err.message}`, 'error');
+    }
+}
+
 async function updatePageData() {
     console.log("Обновление данных на странице...");
     
@@ -62,7 +116,6 @@ async function updatePageData() {
         }
         
         const roomsData = await response.json();
-        console.log("Получены обновленные данные:", roomsData);
         
         if (typeof renderNestedTable === 'function') {
             const currentExpandedState = saveExpandedState();
@@ -74,9 +127,59 @@ async function updatePageData() {
             renderNestedTable();
             
             showNotification('Данные успешно обновлены', 'success');
-        } else {
-            console.log("Функция renderNestedTable не найдена, возможно это не страница Art.html");
         }
+        
+    } catch (err) {
+        console.error("Ошибка обновления данных:", err);
+        showNotification('Ошибка обновления данных: ' + err.message, 'error');
+    }
+}
+
+async function updateAllPageData() {
+    console.log("Обновление всех данных на странице...");
+    
+    try {
+        const roomsResponse = await fetch('/rooms');
+        if (!roomsResponse.ok) {
+            throw new Error('Не удалось загрузить обновленные данные комнат');
+        }
+        
+        const roomsData = await roomsResponse.json();
+        
+        const appsResponse = await fetch('/apps');
+        if (!appsResponse.ok) {
+            throw new Error('Не удалось загрузить обновленные данные приложений');
+        }
+        
+        const appsData = await appsResponse.json();
+        
+        const isArtPage = window.location.pathname === '/' || 
+                         window.location.pathname === '/index.html' || 
+                         window.location.pathname === '/Art.html';
+        
+        const isArt2Page = window.location.pathname === '/art2';
+        
+        if (isArtPage) {
+            if (typeof renderNestedTable === 'function') {
+                const currentExpandedState = saveExpandedState();
+                
+                window.roomsData = roomsData;
+                
+                restoreExpandedState(currentExpandedState);
+                
+                renderNestedTable();
+            }
+        } else if (isArt2Page) {
+            window.roomsData = roomsData;
+            window.readyApps = appsData;
+            
+            if (window.renderRoomsArt2) window.renderRoomsArt2();
+            if (window.renderAppsArt2) window.renderAppsArt2();
+            if (window.updateSelectedCountArt2) window.updateSelectedCountArt2();
+            if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
+        }
+        
+        showNotification('Все данные успешно обновлены', 'success');
         
     } catch (err) {
         console.error("Ошибка обновления данных:", err);
@@ -147,7 +250,6 @@ async function getServerInfo() {
         const response = await fetch('/server_info');
         if (response.ok) {
             const info = await response.json();
-            console.log("Информация о сервере:", info);
             return info;
         }
     } catch (err) {
@@ -196,7 +298,6 @@ function showNotification(message, type = 'info') {
         }, 300);
     }, 5000);
 }
-
 
 const style = document.createElement('style');
 style.textContent = `
@@ -251,10 +352,10 @@ function addSyncButton() {
 
     const syncButton = document.createElement('button');
     syncButton.id = 'syncButton';
-    syncButton.innerHTML = '<i class="fas fa-sync-alt"></i> Синхронизировать';
+    syncButton.innerHTML = '<i class="fas fa-sync-alt"></i> Синхронизировать всё';
     syncButton.className = 'btn btn-warning header-button';
     syncButton.style.marginLeft = '10px';
-    syncButton.onclick = syncRooms;
+    syncButton.onclick = syncAllData;
 
     const isMainPage = window.location.pathname === '/' || 
                       window.location.pathname === '/index.html' || 
@@ -268,14 +369,12 @@ function addSyncButton() {
     }
 }
 
-
 function initializeArtPage() {
     console.log("Инициализация страницы Art.html");
 
     const uploadFilesBtn = document.getElementById('uploadFilesBtn');
     if (uploadFilesBtn) {
         uploadFilesBtn.onclick = goToArt2Page;
-        console.log("Кнопка 'Загрузить файл на компьютеры' настроена на простой переход");
     }
 }
 
@@ -588,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (shouldAutoSync()) {
             console.log("Запуск автоматической синхронизации...");
-            setTimeout(syncRooms, 1000);
+            setTimeout(syncAllData, 1000);
         } else {
             console.log("Пропуск автоматической синхронизации");
 
@@ -606,14 +705,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Глобальные функции
 window.syncRooms = syncRooms;
+window.syncAllData = syncAllData;
 window.sendSelectedToServer = sendSelectedToServer;
 window.showNotification = showNotification;
 window.updatePageData = updatePageData;
+window.updateAllPageData = updateAllPageData;
 window.goToArt2Page = goToArt2Page;
 
-// Глобальные функции для Art2.html
 window.getAllOnlineComputers = getAllOnlineComputers;
 window.getSelectedComputers = getSelectedComputers;
 window.getSelectedApps = getSelectedApps;

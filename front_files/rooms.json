@@ -1,130 +1,52 @@
 [
   {
-    "code": "1",
+    "code": "A123",
     "computers": [
       {
         "expanded": false,
-        "files": [],
-        "id": 1,
-        "ip": "192.168.1.124",
-        "lastActive": "2025-11-21T13:06:50Z",
-        "name": "debian",
+        "files": [
+          {
+            "name": "Документ.pdf",
+            "size": "1.2MB",
+            "status": "uploaded",
+            "type": "PDF документ"
+          }
+        ],
+        "id": 101,
+        "ip": "192.168.0.101",
+        "lastActive": "2025-11-20 16:00",
+        "name": "PC-A1",
         "status": "online"
       },
       {
         "expanded": false,
         "files": [],
-        "id": 34,
-        "ip": "10.0.2.15",
-        "lastActive": "2025-11-21T14:57:39Z",
-        "name": "zakhar-VirtualBox",
+        "id": 102,
+        "ip": "192.168.0.102",
+        "lastActive": "2025-11-19 12:00",
+        "name": "PC-A2",
         "status": "online"
       }
     ],
     "expanded": false,
     "id": 1,
-    "name": "room1"
+    "name": "Комната A"
   },
   {
-    "code": "2",
+    "code": "B456",
     "computers": [
       {
         "expanded": false,
         "files": [],
-        "id": 7,
-        "ip": "10.0.2.15",
-        "lastActive": "2025-11-21T14:29:25Z",
-        "name": "zakhar-VirtualBox",
+        "id": 201,
+        "ip": "192.168.0.201",
+        "lastActive": "2025-11-20 15:45",
+        "name": "PC-B1",
         "status": "online"
       }
     ],
     "expanded": false,
     "id": 2,
-    "name": "ABC"
-  },
-  {
-    "code": "3",
-    "computers": [
-      {
-        "expanded": false,
-        "files": [],
-        "id": 13,
-        "ip": "192.168.1.124",
-        "lastActive": "2025-11-21T13:08:58Z",
-        "name": "debian",
-        "status": "online"
-      }
-    ],
-    "expanded": false,
-    "id": 3,
-    "name": "Room1"
-  },
-  {
-    "code": "4",
-    "computers": [
-      {
-        "expanded": false,
-        "files": [],
-        "id": 15,
-        "ip": "192.168.1.124",
-        "lastActive": "2025-11-21T13:13:01Z",
-        "name": "debian",
-        "status": "online"
-      }
-    ],
-    "expanded": false,
-    "id": 4,
-    "name": "GUK"
-  },
-  {
-    "code": "5",
-    "computers": [
-      {
-        "expanded": false,
-        "files": [],
-        "id": 17,
-        "ip": "192.168.1.124",
-        "lastActive": "2025-11-21T13:15:29Z",
-        "name": "debian",
-        "status": "online"
-      }
-    ],
-    "expanded": false,
-    "id": 5,
-    "name": "TRESHKA_101"
-  },
-  {
-    "code": "6",
-    "computers": [
-      {
-        "expanded": false,
-        "files": [],
-        "id": 18,
-        "ip": "192.168.1.124",
-        "lastActive": "2025-11-21T13:17:39Z",
-        "name": "debian",
-        "status": "online"
-      }
-    ],
-    "expanded": false,
-    "id": 6,
-    "name": "INSTITUT8-101"
-  },
-  {
-    "code": "7",
-    "computers": [
-      {
-        "expanded": false,
-        "files": [],
-        "id": 40,
-        "ip": "10.0.2.15",
-        "lastActive": "2025-11-21T15:02:31Z",
-        "name": "zakhar-VirtualBox",
-        "status": "online"
-      }
-    ],
-    "expanded": false,
-    "id": 7,
-    "name": "88.218.121.7"
+    "name": "Комната B"
   }
 ]

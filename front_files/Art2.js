@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     selectAllAppsBtn.addEventListener('click', function() {
         if (!window.readyApps || window.readyApps.length === 0) {
-            console.log("Нет данных о приложениях");
             return;
         }
         
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function loadRoomsData() {
-        fetch('rooms.json')
+        fetch('/rooms')
             .then(response => {
                 if (!response.ok) throw new Error('Ошибка загрузки rooms.json');
                 return response.json();
@@ -52,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
             })
             .catch(err => {
-                console.error('Ошибка загрузки rooms.json:', err);
                 document.getElementById('roomsGrid').innerHTML = `
                     <div class="empty-message">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -63,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadAppsData() {
-        fetch('apps.json')
+        fetch('/apps')
             .then(response => {
                 if (!response.ok) throw new Error('Ошибка загрузки apps.json');
                 return response.json();
@@ -83,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
             })
             .catch(err => {
-                console.error('Ошибка загрузки apps.json:', err);
                 document.getElementById('appsGrid').innerHTML = `
                     <div class="empty-message">
                         <i class="fas fa-exclamation-triangle"></i>
