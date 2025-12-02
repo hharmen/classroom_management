@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
         }
 
-        console.log('🔗 Переход на страницу выбора файлов...');
+        console.log('Переход на страницу выбора файлов...');
         window.location.href = '/art2';
     });
 
