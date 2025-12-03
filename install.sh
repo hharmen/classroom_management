@@ -1,4 +1,12 @@
 
+echo "=== Установа ssh==="
+
+sudo apt install ssh
+sudo apt update
+sudo apt install snap
+sudo apt update
+sudo apt install snapd
+sudo apt update
 
 echo "=== Установка агента ==="
 
@@ -15,7 +23,7 @@ if [ ! -f ./computer-agent.go ]; then
     exit 1
 fi
 
-go build -o computer-agent
+sudo go build -o computer-agent
 
 sudo mkdir -p /etc/computer-agent
 sudo mkdir -p /var/log/computer-agent

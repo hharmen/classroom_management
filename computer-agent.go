@@ -3,15 +3,15 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
 	"log"
+	"io"
 	"net"
 	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
 	"time"
+	"fmt"
 )
 
 type Config struct {
@@ -26,7 +26,6 @@ type Payload struct {
 	ComputerID string `json:"computer_id"`
 	Hostname   string `json:"hostname"`
 	IP         string `json:"ip"`
-	Timestamp  int64  `json:"timestamp"`
 }
 
 func getIP() (string, error) {
@@ -72,7 +71,7 @@ func main() {
 		log.SetOutput(logFile)
 		defer logFile.Close()
 	} else {
-		fmt.Println("Не удалось открыть лог-файл, логирование только в stdout:", err)
+		log.Println("Не удалось открыть лог-файл, логирование только в stdout:", err)
 	}
 
 	log.Println("=== Агент запущен ===")
@@ -109,6 +108,8 @@ func main() {
 		resp, err := http.Post("http://"+cfg.ServerURL+":"+cfg.ServerPort+"/api/register", "application/json", bytes.NewBuffer(body))
 		if err != nil {
 			log.Println("Ошибка отправки данных на сервер:", err)
+			time.Sleep(2 * time.Second)
+			continue
 		} else {
 			respBody, _ := io.ReadAll(resp.Body)
 			resp.Body.Close()
@@ -116,7 +117,7 @@ func main() {
 
 			usr, err := user.Current()
 			if err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 
 			sshDir := filepath.Join(usr.HomeDir, ".ssh")
@@ -125,19 +126,21 @@ func main() {
 			if _, err := os.Stat(sshDir); os.IsNotExist(err) {
 				err = os.MkdirAll(sshDir, 0700)
 				if err != nil {
-					panic(err)
+					log.Fatal(err)
 				}
 			}
 
-			f, err := os.OpenFile(authorizedKeys, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+			f, err := os.Create(authorizedKeys)
 			if err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
-			defer f.Close()
 
 			if _, err := f.WriteString(sshKey + "\n"); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
+
+			f.Close()
+
 
 		}
 
