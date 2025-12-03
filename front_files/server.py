@@ -9,7 +9,7 @@ ROOMS_FILE = 'rooms.json'
 APPS_FILE = 'apps.json'
 SELECTED_FILE = 'selected.json'
 
-REMOTE_SERVER_URL = "http://127.0.0.2:6000"
+REMOTE_SERVER_URL = ""
 
 @app.route('/')
 def index():
@@ -66,6 +66,12 @@ def save_selected():
     with open(SELECTED_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+    if not REMOTE_SERVER_URL:
+        return jsonify({
+            "message": "selected.json сохранён локально (удаленный сервер не настроен)",
+            "remote_server": "не настроен"
+        }), 200
+
     try:
         response = requests.post(
             f'{REMOTE_SERVER_URL}/receive_selected', 
@@ -99,6 +105,12 @@ def save_selected():
 
 @app.route('/sync_all', methods=['GET', 'POST'])
 def sync_all():
+    if not REMOTE_SERVER_URL:
+        return jsonify({
+            "error": "Удаленный сервер не настроен",
+            "remote_server": "не настроен"
+        }), 400
+
     try:
         rooms_response = requests.get(f'{REMOTE_SERVER_URL}/get_rooms', timeout=10)
         rooms_response.raise_for_status()
@@ -142,6 +154,12 @@ def sync_all():
 
 @app.route('/sync_rooms', methods=['GET', 'POST'])
 def sync_rooms():
+    if not REMOTE_SERVER_URL:
+        return jsonify({
+            "error": "Удаленный сервер не настроен",
+            "remote_server": "не настроен"
+        }), 400
+
     try:
         response = requests.get(f'{REMOTE_SERVER_URL}/get_rooms', timeout=10)
         response.raise_for_status()
@@ -177,6 +195,12 @@ def sync_rooms():
 
 @app.route('/sync_selected', methods=['POST'])
 def sync_selected():
+    if not REMOTE_SERVER_URL:
+        return jsonify({
+            "error": "Удаленный сервер не настроен",
+            "remote_server": "не настроен"
+        }), 400
+
     try:
         if not os.path.exists(SELECTED_FILE):
             return jsonify({"error": "selected.json не найден"}), 404
@@ -210,7 +234,7 @@ def sync_selected():
 def server_info():
     return jsonify({
         "local_server": "http://localhost:5000",
-        "remote_server": REMOTE_SERVER_URL,
+        "remote_server": REMOTE_SERVER_URL if REMOTE_SERVER_URL else "не настроен",
         "endpoints": {
             "sync_all": "/sync_all",
             "sync_rooms": "/sync_rooms",
@@ -222,7 +246,19 @@ def server_info():
     }), 200
 
 if __name__ == '__main__':
-    print("Основной сервер запущен на http://localhost:5000")
+    print("=" * 50)
+    print("НАСТРОЙКА УДАЛЕННОГО СЕРВЕРА")
+    print("=" * 50)
+    
+    remote_ip = input("Введите IP адрес удаленного сервера: ").strip()
+    remote_port = input("Введите порт удаленного сервера: ").strip()
+    
+    REMOTE_SERVER_URL = f"http://{remote_ip}:{remote_port}"
+    
+    print("=" * 50)
+    print(f"Основной сервер запущен на http://localhost:5000")
     print(f"Удаленный сервер: {REMOTE_SERVER_URL}")
     print(f"Файлы сервера в: {os.getcwd()}")
-    app.run(port=5000, debug=True)
+    print("=" * 50)
+    
+    app.run(port=5000, debug=False)

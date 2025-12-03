@@ -1,15 +1,16 @@
 {
   "computers": [
     {
-      "id": 7,
-      "name": "zakhar-VirtualBox"
-    },
-    {
-      "id": 17,
-      "name": "debian"
+      "id": 101,
+      "name": "PC-A1"
     }
   ],
   "apps": [
+    {
+      "id": 1,
+      "name": "Notepad++",
+      "version": "8.5"
+    },
     {
       "id": 2,
       "name": "VLC Media Player",

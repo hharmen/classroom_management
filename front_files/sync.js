@@ -28,13 +28,12 @@ async function syncRooms() {
         if (statusElement) {
             statusElement.innerHTML = `
                 <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                <span>${result.message}</span>
+                <span>Подключено к серверу</span>
             `;
             statusElement.className = 'connection-status connected';
         }
         
-        const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
-        showNotification(result.message + serverInfo, 'success');
+        showNotification('Комнаты успешно синхронизированы', 'success');
         
         updatePageData();
         
@@ -48,7 +47,7 @@ async function syncRooms() {
             statusElement.className = 'connection-status error';
         }
         
-        showNotification(`Ошибка синхронизации: ${err.message}`, 'error');
+        showNotification(`Ошибка синхронизации`, 'error');
     }
 }
 
@@ -82,13 +81,12 @@ async function syncAllData() {
         if (statusElement) {
             statusElement.innerHTML = `
                 <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                <span>${result.message}</span>
+                <span>Подключено к серверу</span>
             `;
             statusElement.className = 'connection-status connected';
         }
         
-        const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
-        showNotification(result.message + serverInfo, 'success');
+        showNotification('Данные успешно синхронизированы', 'success');
         
         updateAllPageData();
         
@@ -102,7 +100,7 @@ async function syncAllData() {
             statusElement.className = 'connection-status error';
         }
         
-        showNotification(`Ошибка синхронизации: ${err.message}`, 'error');
+        showNotification(`Ошибка синхронизации`, 'error');
     }
 }
 
@@ -125,13 +123,11 @@ async function updatePageData() {
             restoreExpandedState(currentExpandedState);
             
             renderNestedTable();
-            
-            showNotification('Данные успешно обновлены', 'success');
         }
         
     } catch (err) {
         console.error("Ошибка обновления данных:", err);
-        showNotification('Ошибка обновления данных: ' + err.message, 'error');
+        showNotification('Ошибка обновления данных', 'error');
     }
 }
 
@@ -179,11 +175,9 @@ async function updateAllPageData() {
             if (window.updateDownloadAllButtonArt2) window.updateDownloadAllButtonArt2();
         }
         
-        showNotification('Все данные успешно обновлены', 'success');
-        
     } catch (err) {
         console.error("Ошибка обновления данных:", err);
-        showNotification('Ошибка обновления данных: ' + err.message, 'error');
+        showNotification('Ошибка обновления данных', 'error');
     }
 }
 
@@ -219,12 +213,7 @@ async function sendSelectedToServer() {
         const result = await saveResponse.json();
         console.log(result.message);
         
-        const serverInfo = result.remote_server ? ` (сервер: ${result.remote_server})` : '';
-        if (result.remote_response && result.remote_response.saved_to_file) {
-            showNotification(`${result.message} - сохранено в ${result.remote_response.saved_to_file}${serverInfo}`, 'success');
-        } else {
-            showNotification(result.message + serverInfo, 'success');
-        }
+        showNotification('Данные отправлены на сервер', 'success');
         
         setTimeout(() => {
             window.location.href = '/art2';
@@ -232,7 +221,7 @@ async function sendSelectedToServer() {
         
     } catch (err) {
         console.error("Ошибка отправки selected.json:", err);
-        showNotification(`Ошибка отправки selected.json: ${err.message}`, 'error');
+        showNotification(`Ошибка отправки данных`, 'error');
         
         setTimeout(() => {
             window.location.href = '/art2';
