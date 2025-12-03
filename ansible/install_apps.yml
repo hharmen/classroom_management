@@ -1,49 +1,117 @@
-- name: Install selected programs on Ubuntu
+---
+- name: Install various applications
   hosts: all
   become: yes
-  vars_files:
-    - group_vars/all.yml
-
+  vars:
+    # Версии и настройки
+    pycharm_version: "professional"  # или "community"
+    blender_version: "3.6"  # можно изменить
+    
   tasks:
+  
     - name: Update apt cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
+      tags: always
 
-    - name: Install LibreOffice
-      apt:
-        name: "libreoffice={{ install_programs.libreoffice }}"
-        state: present
-      when: install_programs.libreoffice is defined
-
+    # Установка Git
     - name: Install Git
       apt:
-        name: "git={{ install_programs.git }}"
+        name: git
         state: present
-      when: install_programs.git is defined
+      tags: git
 
-    - name: Install VLC
+    # Установка Chrome
+    - name: Install Google Chrome dependencies
       apt:
-        name: "vlc={{ install_programs.vlc }}"
+        name: 
+          - wget
+          - gdebi-core
         state: present
-      when: install_programs.vlc is defined
+      tags: chrome
 
-    - name: Install PyCharm
+    - name: Download Google Chrome
+      get_url:
+        url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dest: /tmp/google-chrome-stable_current_amd64.deb
+        mode: '0644'
+      tags: chrome
+
+    - name: Install Google Chrome
+      apt:
+        deb: /tmp/google-chrome-stable_current_amd64.deb
+      tags: chrome
+
+    # Установка LibreOffice
+    - name: Install LibreOffice
+      apt:
+        name: 
+          - libreoffice
+          - libreoffice-l10n-ru  # русский язык
+        state: present
+      tags: libreoffice
+
+    # Установка Blender (через snap)
+    - name: Install Blender via snap
       snap:
-        name: "pycharm-professional"
+        name: blender
+        classic: yes  # для доступа к системным файлам
+        state: present
+      tags: blender
+
+    # Альтернатива: Установка Blender из официального репозитория
+    - name: Install Blender from official repo (альтернативный способ)
+      block:
+        - name: Add Blender PPA
+          apt_repository:
+            repo: ppa:thomas-schiex/blender
+            state: present
+          when: ansible_distribution == 'Ubuntu'
+
+        - name: Install Blender
+          apt:
+            name: blender
+            state: present
+      tags: blender_ppa
+
+    # Установка PyCharm (через snap)
+    - name: Install PyCharm Community via snap
+      snap:
+        name: pycharm-community
         classic: yes
         state: present
-        channel: "{{ install_programs.pycharm }}"
-      when: install_programs.pycharm is defined
+      when: pycharm_version == "community"
+      tags: pycharm
 
-    - name: Gather installed version and size
-      shell: |
-        dpkg-query -W -f='${Package} ${Version} ${Installed-Size}\n' {{ item }}
-      register: app_info
-      loop: "{{ install_programs.keys() | list }}"
-      ignore_errors: yes
+    - name: Install PyCharm Professional via snap
+      snap:
+        name: pycharm-professional
+        classic: yes
+        state: present
+      when: pycharm_version == "professional"
+      tags: pycharm
 
-    - name: Show installed apps info
-      debug:
-        msg: "{{ item.stdout }}"
-      loop: "{{ app_info.results }}"
+    # Альтернатива: Установка PyCharm вручную
+    - name: Install PyCharm manually (альтернативный способ)
+      block:
+        - name: Download PyCharm
+          get_url:
+            url: "https://download.jetbrains.com/python/pycharm-{{ pycharm_version }}-{{ ansible_distribution_release }}.tar.gz"
+            dest: /tmp/pycharm.tar.gz
+            mode: '0644'
+
+        - name: Extract PyCharm
+          unarchive:
+            src: /tmp/pycharm.tar.gz
+            dest: /opt/
+            remote_src: yes
+            owner: root
+            group: root
+
+        - name: Create symlink
+          file:
+            src: "/opt/pycharm-*/bin/pycharm.sh"
+            dest: /usr/local/bin/pycharm
+            state: link
+      tags: pycharm_manual

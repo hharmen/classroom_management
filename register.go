@@ -8,7 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/user"
+	"os/exec"
+	"bytes"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -55,7 +56,11 @@ func UpdateIni(db *sql.DB) error {
 		}
 		computers = computers + fmt.Sprintf("%s-%s ansible_host=%s ansible_user=root\n", RoomName, ComputerName, IP)
 	}
-	err = os.WriteFile("....", []byte(computers), 0644)
+
+	cmd := exec.Command("sudo", "tee", "/opt/myserver/ansible/hosts.ini")
+	cmd.Stdin = bytes.NewBufferString(computers)
+	_, err = cmd.CombinedOutput()
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,7 +77,7 @@ func AddRoom(db *sql.DB, name string) error {
 	return err
 }
 
-func handler_reg(w http.ResponseWriter, r *http.Request) {
+func handlerReg(w http.ResponseWriter, r *http.Request) {
 	var data RequestData
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -80,9 +85,8 @@ func handler_reg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser, _ := user.Current()
 
-	sshKeyPath := fmt.Sprintf("/home/%s/.ssh/ed25519.pub", currentUser.Username)
+	sshKeyPath := "/home/hkeee/.ssh/id_rsa.pub"
 
 	file, err := os.Open(sshKeyPath)
 	if err != nil {
@@ -94,13 +98,12 @@ func handler_reg(w http.ResponseWriter, r *http.Request) {
 	scanner.Split(bufio.ScanWords)
 
 	if scanner.Scan() {
-		key := scanner.Text()
-		response := Response{
-			sshKey: key,
-		}
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(response); err != nil {
-			return
+		key_start := scanner.Text()
+		scanner.Scan()
+		key := key_start + " " + scanner.Text()
+
+		if _, err :=  w.Write([]byte(key)); err != nil{
+			log.Fatal(err)
 		}
 		db, err := sql.Open("sqlite3", "./computers.db")
 		if err != nil {

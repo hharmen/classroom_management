@@ -4,6 +4,8 @@ set -e
 
 echo "=== Установка сервера управления ==="
 
+
+
 if [ "$EUID" -ne 0 ]; then
     echo "Ошибка: запустите как root."
     exit 1
@@ -22,20 +24,28 @@ APP_DIR="/opt/$APP_NAME"
 DB_FILE="$APP_DIR/computers.db"
 SERVICE_FILE="/etc/systemd/system/$APP_NAME.service"
 
+go build -o server .
+
+if [ ! -f "./server" ]; then
+    echo "Ошибка: бинарник 'server' не найден рядом с install.sh!"
+    exit 1
+fi
+
+
 echo ">>> Установка сервиса $APP_NAME"
 
 # --- 1. Создаём каталог приложения ---
 echo ">>> Создаю директорию $APP_DIR"
 sudo mkdir -p "$APP_DIR"
 
+
+
 # --- 2. Копируем бинарник сервера ---
-if [ ! -f "./server" ]; then
-    echo "Ошибка: бинарник 'server' не найден рядом с install.sh!"
-    exit 1
-fi
+
 
 echo ">>> Копирую бинарник в $APP_DIR"
 sudo cp ./server "$APP_DIR/server"
+sudo cp ./apps.json "$APP_DIR/apps.json"
 sudo chmod +x "$APP_DIR/server"
 
 if [ ! -d "./ansible" ]; then

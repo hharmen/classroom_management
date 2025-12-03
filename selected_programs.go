@@ -3,10 +3,10 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -27,19 +27,19 @@ type Payload struct {
 	Apps      []App      `json:"apps"`
 }
 
-func handle_select(w http.ResponseWriter, r *http.Request) {
+func handleSelect(w http.ResponseWriter, r *http.Request) {
 
 	var payload Payload
 
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
 		http.Error(w, "Ошибка при разборе JSON: "+err.Error(), http.StatusBadRequest)
-		return
+		log.Fatal(err)
 	}
 
 	db, err := sql.Open("sqlite3", "./computers.db")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Ошибка открытия бд: %s", err)
 	}
 
 	for i := 0; i < len(payload.Computers); i++ {
@@ -51,23 +51,22 @@ func handle_select(w http.ResponseWriter, r *http.Request) {
 			FROM computers c
 			JOIN rooms r ON c.room_id = r.id
 			WHERE c.id = ?
-    		`
+    			`	
 
 			err := db.QueryRow(query, payload.Computers[i].ID).Scan(&roomName)
 			if err != nil {
-				return
+				log.Fatalf("Ошибка чтения строк в бд: %s", err)	
 			}
 
-			cmd := exec.Command("ansible-playbook", "-i", "hosts.ini", "install_apps.yml", "-e", fmt.Sprintf("\"target_hosts=%s-%s\"", payload.Computers[i].Name, roomName), "-e", fmt.Sprintf("install_programs={'%s':'%s'}", payload.Apps[j].Name, payload.Apps[j].Version))
+			cmd := exec.Command("ansible-playbook", "-i", "/opt/myserver/ansible/hosts.ini", "/opt/myserver/ansible/install_apps.yml", "--tags", payload.Apps[j].Name, "--limit", fmt.Sprintf("%s-%s", roomName, payload.Computers[i].Name))
 
 			err = cmd.Run()
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("Ошибка запуска программы : %s %s", err, cmd.String())
 			}
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"status": "успешно получено",

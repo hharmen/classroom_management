@@ -1,0 +1,48 @@
+[
+        {
+            "id": 3,
+            "name": "chrome",
+            "version": "",
+            "description": "Браузер от Google",
+            "size": "",
+            "icon": "fab fa-chrome",
+            "selected": false
+        },
+        {
+            "id": 4,
+            "name": "blender",
+            "version": "",
+            "description": "Программа для 3д моделирования и ренгдеринга",
+            "size": "",
+            "icon": "fas fa-blender",
+            "selected": false
+        },
+        {
+            "id": 5,
+            "name": "libreoffice",
+            "version": "",
+            "description": "Пакет офисных программ для linux",
+            "size": "",
+            "icon": "fas fa-libreoffice",
+            "selected": false
+        },
+        {
+            "id": 6,
+            "name": "pycharm",
+            "version": "",
+            "description": "Среда разработки для python",
+            "size": "",
+            "icon": "fab fa-pycharm",
+            "selected": false
+        },
+        {
+            "id": 8,
+            "name": "git",
+            "version": "",
+            "description": "Система контроля версий",
+            "size": "",
+            "icon": "fas fa-git",
+            "selected": false
+        }
+]
+
