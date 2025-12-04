@@ -1,0 +1,117 @@
+---
+- name: Install various applications
+  hosts: all
+  become: yes
+  vars:
+    # Версии и настройки
+    pycharm_version: "professional"  # или "community"
+    blender_version: "3.6"  # можно изменить
+    
+  tasks:
+  
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      tags: always
+
+    # Установка Git
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+      tags: git
+
+    # Установка Chrome
+    - name: Install Google Chrome dependencies
+      apt:
+        name: 
+          - wget
+          - gdebi-core
+        state: present
+      tags: chrome
+
+    - name: Download Google Chrome
+      get_url:
+        url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dest: /tmp/google-chrome-stable_current_amd64.deb
+        mode: '0644'
+      tags: chrome
+
+    - name: Install Google Chrome
+      apt:
+        deb: /tmp/google-chrome-stable_current_amd64.deb
+      tags: chrome
+
+    # Установка LibreOffice
+    - name: Install LibreOffice
+      apt:
+        name: 
+          - libreoffice
+          - libreoffice-l10n-ru  # русский язык
+        state: present
+      tags: libreoffice
+
+    # Установка Blender (через snap)
+    - name: Install Blender via snap
+      snap:
+        name: blender
+        classic: yes  # для доступа к системным файлам
+        state: present
+      tags: blender
+
+    # Альтернатива: Установка Blender из официального репозитория
+    - name: Install Blender from official repo (альтернативный способ)
+      block:
+        - name: Add Blender PPA
+          apt_repository:
+            repo: ppa:thomas-schiex/blender
+            state: present
+          when: ansible_distribution == 'Ubuntu'
+
+        - name: Install Blender
+          apt:
+            name: blender
+            state: present
+      tags: blender_ppa
+
+    # Установка PyCharm (через snap)
+    - name: Install PyCharm Community via snap
+      snap:
+        name: pycharm-community
+        classic: yes
+        state: present
+      when: pycharm_version == "community"
+      tags: pycharm
+
+    - name: Install PyCharm Professional via snap
+      snap:
+        name: pycharm-professional
+        classic: yes
+        state: present
+      when: pycharm_version == "professional"
+      tags: pycharm
+
+    # Альтернатива: Установка PyCharm вручную
+    - name: Install PyCharm manually (альтернативный способ)
+      block:
+        - name: Download PyCharm
+          get_url:
+            url: "https://download.jetbrains.com/python/pycharm-{{ pycharm_version }}-{{ ansible_distribution_release }}.tar.gz"
+            dest: /tmp/pycharm.tar.gz
+            mode: '0644'
+
+        - name: Extract PyCharm
+          unarchive:
+            src: /tmp/pycharm.tar.gz
+            dest: /opt/
+            remote_src: yes
+            owner: root
+            group: root
+
+        - name: Create symlink
+          file:
+            src: "/opt/pycharm-*/bin/pycharm.sh"
+            dest: /usr/local/bin/pycharm
+            state: link
+      tags: pycharm_manual
