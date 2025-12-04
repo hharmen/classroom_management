@@ -1,4 +1,0 @@
-- hosts: all_students
-  tasks:
-    - ping:
-

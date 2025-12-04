@@ -1,0 +1,20 @@
+{
+  "computers": [
+    {
+      "id": 101,
+      "name": "PC-A1"
+    }
+  ],
+  "apps": [
+    {
+      "id": 1,
+      "name": "Notepad++",
+      "version": "8.5"
+    },
+    {
+      "id": 2,
+      "name": "VLC Media Player",
+      "version": "3.0.18"
+    }
+  ]
+}

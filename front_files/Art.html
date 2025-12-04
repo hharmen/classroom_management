@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+  <html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuckWeb - Мониторинг компьютеров</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.css"/>
+    <link rel="stylesheet" href="Art.css">
+    <script src="Art.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <h1 class="logo">DuckWeb</h1>
+        <div class="header-buttons">
+          <button class="btn btn-outline-light header-button header-button-upload" id="uploadFilesBtn">
+            <i class="fas fa-cloud-upload-alt"></i>
+            Загрузить файл на компьютеры
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="nested-table-section">
+      <div class="connection-status" id="connectionStatus">
+        <div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+        <span>Подключение к серверу...</span>
+      </div>
+    </div>
+
+    <div class="nested-table-section">
+      <div class="section-header">
+        <h2 class="section-title">Комнаты и компьютеры</h2>
+        <div class="section-actions">
+          <button class="btn btn-outline-secondary action-btn" id="refreshTable">
+            <i class="fas fa-sync-alt"></i> Обновить
+          </button>
+          <button class="btn btn-outline-primary action-btn toggle-expand-btn" id="toggleExpandBtn">
+            <span class="expand-icon">
+              <i class="fas fa-expand"></i> Развернуть все
+            </span>
+            <span class="collapse-icon">
+              <i class="fas fa-compress"></i> Свернуть все
+            </span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="nested-table" id="nestedTable">
+        <div class="loading-message">
+          <div class="spinner"></div>
+          <h4>Ожидание данных от сервера...</h4>
+          <p>Пожалуйста, подождите, пока система загрузит информацию о комнатах и компьютерах</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.js"></script>
+
+    <script src="sync.js"></script>
+
+  </body>
+  </html>

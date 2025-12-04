@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DuckWeb - Загрузка файлов</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="Art2.css">
+  <script src="Art2.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <h1 class="logo">DuckWeb - Загрузка файлов</h1>
+      <div class="header-buttons">
+        <button class="btn header-button header-button-back" id="backBtn">
+          <i class="fas fa-arrow-left"></i>
+          Назад к мониторингу
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="rooms-section">
+    <div class="rooms-header">
+      <h2 class="section-title">
+        Выберите компьютеры для загрузки
+        <span class="selected-count" id="selectedCount">0</span>
+      </h2>
+      <div class="rooms-controls">
+        <button class="control-btn control-btn-outline" id="selectAllBtn">
+          <i class="fas fa-check-double"></i> Выбрать все
+        </button>
+        <button class="control-btn control-btn-refresh" id="refreshRooms">
+          <i class="fas fa-sync-alt"></i> Обновить
+        </button>
+      </div>
+    </div>
+    
+    <div class="rooms-grid" id="roomsGrid">
+      <div class="empty-message">
+        <i class="fas fa-spinner fa-spin"></i>
+        Загрузка данных...
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="apps-section">
+    <div class="apps-header">
+      <h2 class="apps-title">Готовые приложения для загрузки</h2>
+      <div class="apps-controls">
+        <button class="control-btn control-btn-primary" id="selectAllAppsBtn">
+          <i class="fas fa-check-double"></i> Выбрать все приложения
+        </button>
+      </div>
+    </div>
+    
+    <div class="apps-grid" id="appsGrid">
+      <div class="empty-message">
+        <i class="fas fa-spinner fa-spin"></i>
+        Загрузка приложений...
+      </div>
+    </div>
+  </div>
+
+  <!-- Большая кнопка внизу экрана -->
+  <div class="download-all-section">
+    <button class="download-all-btn" id="downloadAllBtn" disabled>
+      <i class="fas fa-download"></i> Скачать <span id="selectedFilesCount">0</span> файлов на <span id="selectedComputersCount">0</span> выбранных компьютеров
+    </button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.js"></script>
+
+  <script src="sync.js"></script>
+
+
+</body>
+</html>

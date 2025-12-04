@@ -1,0 +1,83 @@
+[
+  {
+    "description": "Текстовый редактор для программистов",
+    "icon": "fas fa-file-alt",
+    "id": 1,
+    "name": "Notepad++",
+    "selected": false,
+    "size": "5 MB",
+    "version": "8.5"
+  },
+  {
+    "description": "Медиа-плеер с поддержкой всех форматов",
+    "icon": "fas fa-play-circle",
+    "id": 2,
+    "name": "VLC Media Player",
+    "selected": false,
+    "size": "40 MB",
+    "version": "3.0.18"
+  },
+  {
+    "description": "Браузер от Google",
+    "icon": "fab fa-chrome",
+    "id": 3,
+    "name": "Google Chrome",
+    "selected": false,
+    "size": "120 MB",
+    "version": "118.0"
+  },
+  {
+    "description": "Архиватор с высокой степенью сжатия",
+    "icon": "fas fa-file-archive",
+    "id": 4,
+    "name": "7-Zip",
+    "selected": false,
+    "size": "2 MB",
+    "version": "23.01"
+  },
+  {
+    "description": "Программа для просмотра PDF файлов",
+    "icon": "fas fa-file-pdf",
+    "id": 5,
+    "name": "Adobe Reader",
+    "selected": false,
+    "size": "350 MB",
+    "version": "2023.006"
+  },
+  {
+    "description": "Мессенджер с облачным хранением",
+    "icon": "fab fa-telegram",
+    "id": 6,
+    "name": "Telegram",
+    "selected": false,
+    "size": "80 MB",
+    "version": "4.11"
+  },
+  {
+    "description": "Видеоконференции и онлайн встречи",
+    "icon": "fas fa-video",
+    "id": 7,
+    "name": "Zoom",
+    "selected": false,
+    "size": "200 MB",
+    "version": "5.17.11"
+  },
+  {
+    "description": "Архиватор с поддержкой RAR формата",
+    "icon": "fas fa-compress-alt",
+    "id": 8,
+    "name": "WinRAR",
+    "selected": false,
+    "size": "4 MB",
+    "version": "6.24"
+  },
+  {
+    "description": "Редактор кода от Microsoft",
+    "icon": "fas fa-code",
+    "id": 9,
+    "name": "Visual Studio Code",
+    "selected": false,
+    "size": "85 MB",
+    "version": "1.84"
+  }
+]

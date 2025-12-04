@@ -1,0 +1,52 @@
+[
+  {
+    "code": "A123",
+    "computers": [
+      {
+        "expanded": false,
+        "files": [
+          {
+            "name": "Документ.pdf",
+            "size": "1.2MB",
+            "status": "uploaded",
+            "type": "PDF документ"
+          }
+        ],
+        "id": 101,
+        "ip": "192.168.0.101",
+        "lastActive": "2025-11-20 16:00",
+        "name": "PC-A1",
+        "status": "online"
+      },
+      {
+        "expanded": false,
+        "files": [],
+        "id": 102,
+        "ip": "192.168.0.102",
+        "lastActive": "2025-11-19 12:00",
+        "name": "PC-A2",
+        "status": "online"
+      }
+    ],
+    "expanded": false,
+    "id": 1,
+    "name": "Комната A"
+  },
+  {
+    "code": "B456",
+    "computers": [
+      {
+        "expanded": false,
+        "files": [],
+        "id": 201,
+        "ip": "192.168.0.201",
+        "lastActive": "2025-11-20 15:45",
+        "name": "PC-B1",
+        "status": "online"
+      }
+    ],
+    "expanded": false,
+    "id": 2,
+    "name": "Комната B"
+  }
+]
